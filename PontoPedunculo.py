@@ -141,6 +141,28 @@ def encontraPontosCandidatos(areaPedunculo):
         return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo
 
     #cv2.imwrite("segmentada.png", areaPedunculo)
+
+def verificaPonto(areaPedunculo, pontoX, pontoY):
+
+    """
+    Função: verifica os pixel em uma posição na imagem
+
+    Parâmetro: 
+
+    Ajuste:
+    """
+            
+    verifica = 0
+
+    if np.any(areaPedunculo[pontoY, pontoX] < 1):
+
+        verifica = 0
+
+    else:
+
+        verifica = 1
+
+    return verifica  
     
 def calculaPesoY(pesosY):
     
@@ -204,6 +226,14 @@ def calculaMediaPontos(pontos):
     calMedia = int(calMedia)
     
     return calMedia
+
+def localizaProximo(pontosX, valorMediaX): 
+      
+     pontosX = np.asarray(pontosX) 
+
+     idx = (np.abs(pontosX - valorMediaX)).argmin() 
+
+     return idx
 
 def encontraCoordenadasPonderada(areaPedunculo):
 
@@ -275,24 +305,21 @@ def encontraCoordenadasPonderada(areaPedunculo):
     pontoX = int(pontoX)
     pontoY = int(pontoY)
     
-    cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,0,0), -1)
+    if(verificaPonto(areaPedunculo, pontoX, pontoY)):
 
-    return pontoX, pontoY, imagemHUE
+        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,0,0), -1)
 
-def Kmeans(areaPedunculo, qtdBusca):
+        return pontoX, pontoY, imagemHUE
 
-    pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+    else:
 
-    coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
+        index = localizaProximo(coordenadasY, pontoY)
 
-    pontosKmeans = np.float32(coordenadas)
+        pontoX, pontoY = coordenadasX[index], coordenadasY[index]
 
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    ret, label, center = cv2.kmeans(pontosKmeans, qtdBusca, None, criteria, 10, cv2.KMEANS_PP_CENTERS)
-    
-    pontoX, pontoY = int(center[:,0]), int(center[:,1])
+        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,0,0), -1)
 
-    cv2.circle(imagemHUE, (pontoX, pontoY), 6, (0,0,255), -1)
+        return pontoX, pontoY, imagemHUE
 
     return pontoX, pontoY, imagemHUE
 
@@ -315,12 +342,61 @@ def encontraCoordenadasMedia(areaPedunculo):
     mediaSimplesX = np.mean(coordenadasX)
     mediaSimplesY = np.mean(coordenadasY)
     
-    mediaNovoX = int(mediaSimplesX)
-    mediaNovoY = int(mediaSimplesY)
+    pontoX = int(mediaSimplesX)
+    pontoY = int(mediaSimplesY)
 
-    cv2.circle(imagemHUE, (mediaNovoX, mediaNovoY), 6, (0,255,0), -1)
+    if(verificaPonto(areaPedunculo, pontoX, pontoY)):
+
+        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (0,255,0), -1)
+
+        return pontoX, pontoY, imagemHUE
+
+    else:
+
+        index = localizaProximo(coordenadasY, pontoY)
+
+        pontoX, pontoY = coordenadasX[index], coordenadasY[index]
+
+        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (0,255,0), -1)
+
+        return pontoX, pontoY, imagemHUE
+
+def Kmeans(areaPedunculo, qtdBusca):
+
+    pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+
+    cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0)]
+
+    coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
+
+    pontosGeral = []
+    guardaX = []
+    guardaY = []
+
+    pontosKmeans = np.float32(coordenadas)
+
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    ret, label, center = cv2.kmeans(pontosKmeans, qtdBusca, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
     
-    return mediaNovoX, mediaNovoY, imagemHUE
+    for i in range(qtdBusca):
+
+        pontoX = int(center[:,0][i])
+        pontoY = int(center[:,1][i])
+
+        if(verificaPonto(areaPedunculo, pontoX, pontoY)):
+
+
+            cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,255,255), -1)
+
+            pontosGeral.append((pontoX, pontoY))
+            guardaX.append(pontoX)
+            guardaY.append(pontoY)
+
+    for i in range(len(guardaX) - 1):
+
+        cv2.line(imagemHUE, (guardaX[i], guardaY[i]), (guardaX[i+1], guardaY[i+1]), (0,0, 255))
+
+    return pontoX, pontoY, imagemHUE
 
 def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos):
 
@@ -361,151 +437,3 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
 
     return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE
 
-def verifica_pixel(img, pontoY, pontoX):
-
-    """
-    Função:
-
-    Parâmetro:
-
-    Ajuste:
-    """
-            
-    encontrou = 0
-    
-    try:
-
-        if np.any(img[int(pontoY), int(pontoX)] == (0,0,0)):
-
-            encontrou = 0
-            #print("veri", encontrou)
-
-        else:
-
-            encontrou = 1
-            #print("veri", encontrou)
-
-        return encontrou
-    
-    except IndexError:
-        
-        encontrou = 1
-        
-        return encontrou
-    
-
-def localizaPonto(img, pontoY, pontoX):
-
-    """
-    Função:
-
-    Parâmetro:
-
-    Ajuste:
-    """
-    
-    copiaX, copiaY = pontoX, pontoY
-    
-    largura = img.shape[1]
-    altura  = img.shape[0]
-    
-    qtdBusca = 0
-    
-   # print(largura)
-    
-    #Inicia a busca pra esquerda
-    movimento = 1
-    
-    controle = 0
-    
-    while(1):
-        
-        #print("x - y: ", pontoX, pontoY)
-        
-        coordenada = verifica_pixel(img, round(pontoY), round(pontoX))
-                
-        try:
-    
-            if(coordenada == 1):
-
-                pontoY, pontoX = pontoY, pontoX
-                
-                return int(pontoY), int(pontoX), qtdBusca
-            
-            else:
-                
-                if(controle == 0):
-                    
-                    pontoX = pontoX - movimento
-                
-                if(pontoX == 1):
-                    
-                    pontoX = copiaX
-                    movimento = - 1
-                    controle = 1
-                    #print("ok - x = 1")
-                    
-                if(pontoX == largura - 1):
-                    
-                    pontoX = copiaX
-                    controle = 2
-                    #print("ok - x = largura")
-                    
-                    
-                if(controle == 2 and pontoY != altura - 1):
-                    
-                    pontoX = pontoX + 1
-                    pontoY = pontoY + 1
-                    controle = 3
-                        
-                elif(pontoY != altura - 1):
-                    
-                    pontoX = pontoX - 1
-                    pontoY = pontoY + 1
-                    
-                else:
-                    
-                    pontoX = copiaX
-                    pontoY = copiaY
-                                
-            qtdBusca = qtdBusca + 1 
-            
-        except IndexError:
-                        
-            return int(copiaY), int(copiaX), qtdBusca
-
-def kmeans2Pontos(areaPedunculo, qtdBusca):
-
-    pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
-
-    cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0)]
-
-    coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
-
-    pontosGeral = []
-    guardaX = []
-    guardaY = []
-
-    pontosKmeans = np.float32(coordenadas)
-
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    ret, label, center = cv2.kmeans(pontosKmeans, qtdBusca, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-    
-    for i in range(qtdBusca):
-
-        pontoX = int(center[:,0][i])
-        pontoY = int(center[:,1][i])
-
-        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,255,255), -1)
-
-        pontosGeral.append((pontoX, pontoY))
-        guardaX.append(pontoX)
-        guardaY.append(pontoY)
-
-    for i in range(qtdBusca - 1):
-
-        cv2.line(imagemHUE, (guardaX[i], guardaY[i]), (guardaX[i+1], guardaY[i+1]), (0,0, 255))
-
-    print(guardaX, guardaY)
-
-    return imagemHUE
