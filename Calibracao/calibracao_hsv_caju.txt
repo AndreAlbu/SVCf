@@ -1,1 +1,0 @@
-hMin:1 sMin:27 vMin:44 - hMax:20 sMax:107 vMax:186
