@@ -10,14 +10,58 @@ com pedúnculo.
 - Gera pontos candidatos ao corte 
 - Função que relaciona as distância dos pontos candidatos para a seleção do mais próximo da fruta
 
-```
+## Instalação
+
+Para utilizar o módulo faça o download do arquivo PontoPedunculo.py
+
+Logo em seguida, coloque-o dentro da mesma pasta do arquivo da chamada principal.
+
+```bash
   import PontoPedunculo as pc
 ```
+Com isso, é possível ter acesso a todas a funções do arquivo.
 
-## Função coordenadaPontoFinal()
+## Uso
 
-#### Entrada
+A etapa inicial é localizar a área do pedúnculo, para isso, utiliza-se a função de preve a área, na qual se baseia na área (caixa) da fruta.
 
+```python
+areaPedunculo = pc.preveAreaPedunculo(xt, yt, xb, yb, 
+                                      limiarLargura, limiarAltura)
+```
+
+| Parâmetro   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `xt, yt` | `int` | coordenada superior da caixa da fruta |
+| `xb, yb` | `int` | coordenada inferior da caixa da fruta |
+| `limiarLargura` | `float` |largura desejada para a área do pedúnculo [0,1] |
+| `limiarAltura` | `float` | altura desejada para a área do pedúnculo [0,1] |
+
+#### Retorna as coordenadas da área do pedúnculo
+
+```
+  x1, y1, x2, y2 = areaPedunculo[0], areaPedunculo[1], areaPedunculo[2], areaPedunculo[3]
+```
+
+#### Área do pedúnculo
+
+Com as coordenadas da área é realizado um corte para que seja obtido somente a parte da imagem referente a área do pedúnculo.
+
+```
+corteAreaPedunculo = imagem_pedunculo[y2:y1, x1:x2]
+```
+
+#### Localização da coordenada final do ponto de corte
+
+```python
+coordenadaFinal = pc.coordenadaPontoFinal(corteAreaPedunculo,
+                                                  baixo,
+                                                  alto,
+                                                  TopLeftX, 
+                                                  TopLeftY, 
+                                                  "Ponderada", 
+                                                  5)
+```
 
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
@@ -31,14 +75,16 @@ com pedúnculo.
 
 #### Retorna
 
+```
+  pontoX, pontoY, areaSegmentada, pontosCandidatos = coordenadaFinal[0], coordenadaFinal[1], coordenadaFinal[2], coordenadaFinal[3]
+```
+
 | Parâmetro   | Tipo       | Descrição                                   |
 | :---------- | :--------- | :------------------------------------------ |
 | `coordenadaFinalX` | `int` | coordenada X |
 | `coordenadaFinalY` | `int` | coordenada Y |
 | `areaPedunculo` | `array` | imagem da região do pedunculo |
 | `imagemHUE` | `array` | imagem com os pontos candidatos marcados |
-
-Retorna as coordenada final do ponto de corte
 
 ## Utiliza
 
