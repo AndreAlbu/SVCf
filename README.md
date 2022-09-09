@@ -86,6 +86,11 @@ coordenadaFinal = pc.coordenadaPontoFinal(corteAreaPedunculo,
 | `areaPedunculo` | `array` | imagem da região do pedunculo |
 | `imagemHUE` | `array` | imagem com os pontos candidatos marcados |
 
+## Melhorias
+
+- Modularização do código
+- Adição do método K-means para encontrar a coordenada final
+
 ## Utiliza
 
 [OpenCV](https://opencv.org/)
