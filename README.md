@@ -10,12 +10,11 @@ com pedúnculo.
 - Gera pontos candidatos ao corte 
 - Função que relaciona as distância dos pontos candidatos para a seleção do mais próximo da fruta
 
-
-## Função coordenadaPontoFinal()
-
 ```
   import PontoPedunculo as pc
 ```
+
+## Função coordenadaPontoFinal()
 
 #### Entrada
 
