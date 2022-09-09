@@ -59,7 +59,7 @@ coordenadaFinal = pc.coordenadaPontoFinal(corteAreaPedunculo,
                                                   alto,
                                                   TopLeftX, 
                                                   TopLeftY, 
-                                                  "Ponderada", 
+                                                  " ", 
                                                   5)
 ```
 
