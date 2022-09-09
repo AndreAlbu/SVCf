@@ -13,8 +13,8 @@ com pedúnculo.
 
 ## Função coordenadaPontoFinal()
 
-```http
-  import PontoPedunculo
+```
+  import PontoPedunculo as pc
 ```
 
 #### Entrada
