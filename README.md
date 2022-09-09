@@ -13,11 +13,12 @@ com pedúnculo.
 
 ## Função coordenadaPontoFinal()
 
+```http
+  import PontoPedunculo
+```
+
 #### Entrada
 
-```http
-  areaPedunculo, limiarBaixo, limiarAlto, topLeftX, topLeftY, tipoBusca, qtdPontos
-```
 
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
@@ -30,10 +31,6 @@ com pedúnculo.
 | `qtdPontos` | `int` | Quantidade de cluster  |
 
 #### Retorna
-
-```http
-  coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE
-```
 
 | Parâmetro   | Tipo       | Descrição                                   |
 | :---------- | :--------- | :------------------------------------------ |
