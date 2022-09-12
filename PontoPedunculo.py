@@ -386,15 +386,15 @@ def Kmeans(areaPedunculo, qtdBusca):
         if(verificaPonto(areaPedunculo, pontoX, pontoY)):
 
 
-            cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,255,255), -1)
+            cv2.circle(imagemHUE, (pontoX, pontoY), 6, (128,0,0), -1)
 
             pontosGeral.append((pontoX, pontoY))
             guardaX.append(pontoX)
             guardaY.append(pontoY)
 
-    for i in range(len(guardaX) - 1):
+    index = guardaY.index(max(guardaY))
 
-        cv2.line(imagemHUE, (guardaX[i], guardaY[i]), (guardaX[i+1], guardaY[i+1]), (0,0, 255))
+    pontoX, pontoY = guardaX[index], guardaY[index]
 
     return pontoX, pontoY, imagemHUE
 
