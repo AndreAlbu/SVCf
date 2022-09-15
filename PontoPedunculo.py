@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura):
+def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa):
     
     """
     Função: Localizar a área do pedúnculo
@@ -29,7 +29,7 @@ def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura):
     x1 = centro - centroCaixa
     x2 = centro + centroCaixa
 
-    y1 = abs(yt - 50) 
+    y1 = abs(yt + alturaCaixa) 
     y2 = abs(RoiH - y1)
 
     #Converte todas as coordenadas para um número inteiro
