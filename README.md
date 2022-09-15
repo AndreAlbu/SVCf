@@ -26,8 +26,7 @@ Com isso, é possível ter acesso a todas a funções do arquivo.
 A etapa inicial é localizar a área do pedúnculo, para isso, utiliza-se a função de preve a área, na qual se baseia na área (caixa) da fruta.
 
 ```python
-areaPedunculo = pc.preveAreaPedunculo(xt, yt, xb, yb, 
-                                      limiarLargura, limiarAltura)
+areaPedunculo = pc.preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, distanciaCaixa)
 ```
 
 | Parâmetro   | Tipo       | Descrição                           |
@@ -36,6 +35,7 @@ areaPedunculo = pc.preveAreaPedunculo(xt, yt, xb, yb,
 | `xb, yb` | `int` | coordenada inferior da caixa da fruta |
 | `limiarLargura` | `float` |largura desejada para a área do pedúnculo [0,1] |
 | `limiarAltura` | `float` | altura desejada para a área do pedúnculo [0,1] |
+| `distanciaCaixa` | `int` | distância entre a caixa do pedúnculo e a caixa da fruta |
 
 #### Retorna as coordenadas da área do pedúnculo
 
