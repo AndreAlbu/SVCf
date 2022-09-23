@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
+from sklearn.ensemble import IsolationForest
+
 
 def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa):
     
@@ -363,40 +365,100 @@ def encontraCoordenadasMedia(areaPedunculo):
 
 def Kmeans(areaPedunculo, qtdBusca):
 
-    pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+	pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
 
-    cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0)]
+	cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0), (50,50,50), (255,255,30)]
 
-    coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
+	coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
 
-    pontosGeral = []
-    guardaX = []
-    guardaY = []
+	pontosGeral = []
+	guardaX = []
+	guardaY = []
 
-    pontosKmeans = np.float32(coordenadas)
+	pontosKmeans = np.float32(coordenadas)
 
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-    ret, label, center = cv2.kmeans(pontosKmeans, qtdBusca, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-    
-    for i in range(qtdBusca):
+	criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 
-        pontoX = int(center[:,0][i])
-        pontoY = int(center[:,1][i])
+	ret, label, center = cv2.kmeans(pontosKmeans, qtdBusca, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
-        if(verificaPonto(areaPedunculo, pontoX, pontoY)):
+	for i in range(qtdBusca):
+
+	    pontoX = int(center[:,0][i])
+	    pontoY = int(center[:,1][i])
+
+	    if(verificaPonto(areaPedunculo, pontoX, pontoY)):
+
+	        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (128,0,0), -1)
+
+	        pontosGeral.append((pontoY, pontoX))
+	        guardaX.append(pontoX)
+	        guardaY.append(pontoY)
+
+	pontosGeral.sort()
+
+	isolation = funcIsolationForest(pontosGeral)
+
+	print(isolation)
+
+	tamanho = len(isolation)
+
+	if(tamanho > 0):
+
+		posicao = round((tamanho / 2) + 1)
+
+		for i in range(tamanho - 1):
+
+			cv2.line(imagemHUE, (isolation[i][1], isolation[i][0]), (isolation[i+1][1], isolation[i+1][0]), (cores[i]), 2)
+
+		
+		pontoX, pontoY = isolation[posicao][1], isolation[posicao][0]
+
+		pontoX, pontoY = int(pontoX), int(pontoY)
+
+	else:
+
+		idx = guardaX.index(np.max(guardaX))
+
+		pontoX, pontoY = isolation[idx], isolation[idx]
+
+		pontoX, pontoY = int(pontoX), int(pontoY)
+
+	cv2.circle(imagemHUE, (pontoX, pontoY), 15, (255,255,255), -1)
+
+	return pontoX, pontoY, imagemHUE
+
+def outliners(coordenadas):
+
+	limite = 3
+	media = np.mean(coordenadas[1])
+	desvio = np.std(coordenadas[1])
+
+	listaNova = []
+	galho = []
+
+	#print(media)
+	#print(desvio)
+
+	for i in coordenadas:
+
+		z_score = (i[1] - media) / desvio
+
+		#z_score = abs(z_score)
+
+		#print(z_score)
+
+		galho.append(z_score)
 
 
-            cv2.circle(imagemHUE, (pontoX, pontoY), 6, (128,0,0), -1)
+		if(z_score >= 3 or z_score <= -3):
 
-            pontosGeral.append((pontoX, pontoY))
-            guardaX.append(pontoX)
-            guardaY.append(pontoY)
+			listaNova.append(i)
 
-    index = guardaY.index(max(guardaY))
 
-    pontoX, pontoY = guardaX[index], guardaY[index]
+	print(galho)
+			
 
-    return pontoX, pontoY, imagemHUE
+	return listaNova, galho
 
 def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos):
 
@@ -437,3 +499,24 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
 
     return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE
 
+
+def funcIsolationForest(coordenadas):
+
+	clf = IsolationForest(random_state=0).fit(coordenadas)
+	resul = clf.predict(coordenadas)
+
+	resul = clf.predict(coordenadas)
+
+	cordNovo = []
+
+	for i in range(len(resul)):
+
+	  j = coordenadas[i]
+
+	  if(resul[i] == 1):
+
+	    cordNovo.append(j)
+
+	return cordNovo
+
+	
