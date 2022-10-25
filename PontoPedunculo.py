@@ -57,13 +57,15 @@ def histogramaHSV(image):
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
     # Hue
-    histr0 = cv2.calcHist([image], [0], None, [180], [1, 180])
+    histr0 = cv2.calcHist([image], [0], None, [31], [2, 31])
     
     # Obtém o maior valor do histograma
     ymax = max(histr0)
     xmax, _ = np.where(histr0 == ymax)
 
     valorHue = int(xmax)
+
+    print("Valor do Hue: {}".format(valorHue))
          
     # Quantidade de pixel - posição    
     return valorHue
@@ -363,7 +365,61 @@ def encontraCoordenadasMedia(areaPedunculo):
 
         return pontoX, pontoY, imagemHUE
 
-def Kmeans(areaPedunculo, qtdBusca):
+def outliners(coordenadas):
+
+	limite = 3
+	media = np.mean(coordenadas[1])
+	desvio = np.std(coordenadas[1])
+
+	listaNova = []
+	score = []
+
+	#print(media)
+	#print(desvio)
+
+	for i in coordenadas:
+
+		z_score = (i[1] - media) / desvio
+
+		#z_score = abs(z_score)
+
+		#print(z_score)
+
+		score.append(z_score)
+
+
+		if(z_score >= limite or z_score <= -limite):
+
+			listaNova.append(i)
+
+	print("Distancias: {}".format(score))
+
+	print("Coordenadas: {}".format(listaNova))
+
+	return listaNova
+
+def funcIsolationForest(coordenadas):
+
+	clf = IsolationForest(random_state=0).fit(coordenadas)
+	resul = clf.predict(coordenadas)
+
+	resul = clf.predict(coordenadas)
+
+	cordNovo = []
+
+	for i in range(len(resul)):
+
+	  j = coordenadas[i]
+
+	  if(resul[i] == 1):
+
+	    cordNovo.append(j)
+
+	print("Coordenadas:[y,x] {}".format(cordNovo))
+
+	return cordNovo
+
+def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 	pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
 
@@ -396,71 +452,67 @@ def Kmeans(areaPedunculo, qtdBusca):
 
 	pontosGeral.sort()
 
-	isolation = funcIsolationForest(pontosGeral)
+	if(metodo == 2):
 
-	print(isolation)
+		isolation = funcIsolationForest(pontosGeral)
 
-	tamanho = len(isolation)
+		tamanho = len(isolation)
 
-	if(tamanho > 0):
+		if(tamanho > 0):
 
-		posicao = round((tamanho / 2) + 1)
+			posicao = round((tamanho / 2) + 1)
 
-		for i in range(tamanho - 1):
+			for i in range(tamanho - 1):
 
-			cv2.line(imagemHUE, (isolation[i][1], isolation[i][0]), (isolation[i+1][1], isolation[i+1][0]), (cores[i]), 2)
+				cv2.line(imagemHUE, (isolation[i][1], isolation[i][0]), (isolation[i+1][1], isolation[i+1][0]), (cores[i]), 2)
 
-		
-		pontoX, pontoY = isolation[posicao][1], isolation[posicao][0]
+			
+			pontoX, pontoY = isolation[posicao][1], isolation[posicao][0]
 
-		pontoX, pontoY = int(pontoX), int(pontoY)
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		else:
+
+			idx = guardaX.index(np.max(guardaX))
+
+			pontoX, pontoY = isolation[idx], isolation[idx]
+
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		cv2.circle(imagemHUE, (pontoX, pontoY), 15, (255,255,255), -1)
 
 	else:
 
-		idx = guardaX.index(np.max(guardaX))
+		outLin = outliners(pontosGeral)
 
-		pontoX, pontoY = isolation[idx], isolation[idx]
+		tamanho = len(outLin)
 
-		pontoX, pontoY = int(pontoX), int(pontoY)
+		if(tamanho > 0):
 
-	cv2.circle(imagemHUE, (pontoX, pontoY), 15, (255,255,255), -1)
+			posicao = round((tamanho / 2) + 1)
+
+			for i in range(tamanho - 1):
+
+				cv2.line(imagemHUE, (outLin[i][1], outLin[i][0]), (outLin[i+1][1], outLin[i+1][0]), (cores[i]), 2)
+
+			
+			pontoX, pontoY = outLin[posicao][1], outLin[posicao][0]
+
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		else:
+
+			idx = guardaY.index(np.max(guardaY))
+
+			pontoX, pontoY = guardaX[idx], guardaY[idx]
+
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		cv2.circle(imagemHUE, (pontoX, pontoY), 15, (255,255,255), -1)
 
 	return pontoX, pontoY, imagemHUE
 
-def outliners(coordenadas):
-
-	limite = 3
-	media = np.mean(coordenadas[1])
-	desvio = np.std(coordenadas[1])
-
-	listaNova = []
-	galho = []
-
-	#print(media)
-	#print(desvio)
-
-	for i in coordenadas:
-
-		z_score = (i[1] - media) / desvio
-
-		#z_score = abs(z_score)
-
-		#print(z_score)
-
-		galho.append(z_score)
-
-
-		if(z_score >= 3 or z_score <= -3):
-
-			listaNova.append(i)
-
-
-	print(galho)
-			
-
-	return listaNova, galho
-
-def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos):
+def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos, metodo):
 
     """
     Função: Encontra o ponto final na imagem original
@@ -471,6 +523,7 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
                          Media
                          Kmeans
             qtdPontos -> quantos pontos devem ser encontrados no K-means
+            metodo -> 1 (outliners) 2 (IsolationForest)
 
             @Ponderada: os pontos candidatos são gerados a partir da média ponderada dos valores do HUE
             @Média: os pontos candidatos são gerados a partir da média aritimética dos valores do HUE
@@ -482,7 +535,7 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
 
     if(tipoBusca == "Kmeans"):
 
-        pontosCandidatos = Kmeans(areaPedunculo, qtdPontos)
+        pontosCandidatos = Kmeans(areaPedunculo, qtdPontos, metodo)
 
     elif(tipoBusca == "Media"):
 
@@ -498,25 +551,5 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
     coordenadaFinalY = topLeftY + pontoFinalY
 
     return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE
-
-
-def funcIsolationForest(coordenadas):
-
-	clf = IsolationForest(random_state=0).fit(coordenadas)
-	resul = clf.predict(coordenadas)
-
-	resul = clf.predict(coordenadas)
-
-	cordNovo = []
-
-	for i in range(len(resul)):
-
-	  j = coordenadas[i]
-
-	  if(resul[i] == 1):
-
-	    cordNovo.append(j)
-
-	return cordNovo
 
 	
