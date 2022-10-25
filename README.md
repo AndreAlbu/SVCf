@@ -60,7 +60,8 @@ coordenadaFinal = pc.coordenadaPontoFinal(corteAreaPedunculo,
                                                   TopLeftX, 
                                                   TopLeftY, 
                                                   " ", 
-                                                  5)
+                                                  valor,
+                                                  metodo)
 ```
 
 | Parâmetro   | Tipo       | Descrição                           |
@@ -72,6 +73,9 @@ coordenadaFinal = pc.coordenadaPontoFinal(corteAreaPedunculo,
 | `topLeftY` | `int` | coordenada Y da caixa da fruta |
 | `tipoBusca` | `string` | Ponderada - Media - Kmeans |
 | `qtdPontos` | `int` | Quantidade de cluster  |
+| `metodo` | `int` | Remove os outliners  |
+
+Existe duas maneiras de remover os outliners: 1 (outliners) 2 (IsolationForest)
 
 #### Retorna
 
