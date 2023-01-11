@@ -83,68 +83,85 @@ def segmentaAreaPedunculo(areaPedunculo, limiarBaixo, limiarAlto):
 	Ajuste: Os limiares dependem da cultura em análise
 	"""
 
-	hMIN, sMIN, vMIN = limiarBaixo[0], limiarBaixo[1], limiarBaixo[2]
-	hMAX, sMAX, vMAX = limiarAlto[0], limiarAlto[1], limiarAlto[2]
+	try:
 
-	baixo = np.array([hMIN, sMIN, vMIN])
-	alto  = np.array([hMAX, sMAX, vMAX])
+		hMIN, sMIN, vMIN = limiarBaixo[0], limiarBaixo[1], limiarBaixo[2]
+		hMAX, sMAX, vMAX = limiarAlto[0], limiarAlto[1], limiarAlto[2]
 
-	img_hsv = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV)
+		baixo = np.array([hMIN, sMIN, vMIN])
+		alto  = np.array([hMAX, sMAX, vMAX])
 
-	mask = cv2.inRange(img_hsv, baixo, alto)
+		img_hsv = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV)
 
-	areaSegmentada = cv2.bitwise_and(areaPedunculo, areaPedunculo, mask = mask)
+		mask = cv2.inRange(img_hsv, baixo, alto)
 
-	return areaSegmentada
+		areaSegmentada = cv2.bitwise_and(areaPedunculo, areaPedunculo, mask = mask)
+
+		return areaSegmentada
+
+	except:
+
+		print("Area do pedunculo sem informacao")
+		return areaPedunculo
 
 def encontraPontosCandidatos(areaPedunculo):
 
-    """
-    Função: Encontra os pontos candidatos ao corte
+	"""
+	Função: Encontra os pontos candidatos ao corte
 
-    Parâmetro: areaPedunculo -> imagem da região do pedunculo
-    """
+	Parâmetro: areaPedunculo -> imagem da região do pedunculo
+	"""
 
-    areaPedunculo = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV)
+	largura = areaPedunculo.shape[1]
+	altura  = areaPedunculo.shape[0]
 
-    valorMaximoHUE = histogramaHSV(areaPedunculo)
-        
-    largura = areaPedunculo.shape[1]
-    altura  = areaPedunculo.shape[0]
-    
-    centroX = round(largura / 2)
-    centroY = round(altura / 2)
-    
-    todas_coordenadas  =  [] #Guarda todas as coordenadas (eixo X e Y)
-    todas_coordenadasX =  [] #Guarda as coordenadas do eixo X vindas dos cantos encontrados
-    todas_coordenadasY =  [] #Guarda as coordenadas do eixo Y vindas dos cantos encontrados
-        
-    for x in range(0, largura):
+	centroX = round(largura / 2)
+	centroY = round(altura / 2)
 
-        for y in range(0, altura):
+	try:
 
-            h, s, v = areaPedunculo[y, x]
+		areaPedunculo = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV)
 
-            if(h == valorMaximoHUE):
+		valorMaximoHUE = histogramaHSV(areaPedunculo)
 
-                todas_coordenadas.append((x,y))
-                todas_coordenadasX.append(int(x))
-                todas_coordenadasY.append(int(y))
+		todas_coordenadas  =  [] #Guarda todas as coordenadas (eixo X e Y)
+		todas_coordenadasX =  [] #Guarda as coordenadas do eixo X vindas dos cantos encontrados
+		todas_coordenadasY =  [] #Guarda as coordenadas do eixo Y vindas dos cantos encontrados
 
-                cv2.circle(areaPedunculo, (x, y), 1, (255, 0, 255), -1) #purple
-            
-    quantidadePontosEncontrados = len(todas_coordenadas)
-    
-    if(quantidadePontosEncontrados >= 1):
-        
-        return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo
-    
-    else:       
-        
-        todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
-        print("Nao existe pontos!!")
-        
-        return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo
+		for x in range(0, largura):
+
+			for y in range(0, altura):
+
+				h, s, v = areaPedunculo[y, x]
+
+				if(h == valorMaximoHUE):
+
+					todas_coordenadas.append((x,y))
+					todas_coordenadasX.append(int(x))
+					todas_coordenadasY.append(int(y))
+
+					cv2.circle(areaPedunculo, (x, y), 1, (255, 0, 255), -1) #purple
+
+		quantidadePontosEncontrados = len(todas_coordenadas)
+
+		if(quantidadePontosEncontrados >= 1):
+
+			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+
+		else:       
+
+			todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
+			#print("Nao existe pontos!!")
+
+			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+
+	except:
+
+		todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
+		#print("Nao existe pontos!!")
+
+		return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+
 
 
     #cv2.imwrite("segmentada.png", areaPedunculo)
@@ -158,18 +175,24 @@ def verificaPonto(areaPedunculo, pontoX, pontoY):
 
     Ajuste:
     """
+
+    try:
             
-    verifica = 0
+	    verifica = 0
 
-    if np.any(areaPedunculo[pontoY, pontoX] < 1):
+	    if np.any(areaPedunculo[pontoY, pontoX] < 1):
 
-        verifica = 0
+	        verifica = 0
 
-    else:
+	    else:
 
-        verifica = 1
+	        verifica = 1
 
-    return verifica  
+	    return verifica
+
+    except:
+
+    	return 1
     
 def calculaPesoY(pesosY):
     
@@ -254,7 +277,7 @@ def encontraCoordenadasPonderada(areaPedunculo):
 
     coordenadas = encontraPontosCandidatos(areaPedunculo)
 
-    todasCoordenadas, coordenadasX, coordenadasY, imagemHUE = coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3]
+    todasCoordenadas, coordenadasX, coordenadasY, imagemHUE, valorMaximoHUE = coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3], coordenadas[4]
 
     pesoY  =  []
     pesoX  =  []
@@ -314,9 +337,9 @@ def encontraCoordenadasPonderada(areaPedunculo):
     
     if(verificaPonto(areaPedunculo, pontoX, pontoY)):
 
-        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,0,0), -1)
+        cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,0,0), -1)
 
-        return pontoX, pontoY, imagemHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
     else:
 
@@ -324,11 +347,11 @@ def encontraCoordenadasPonderada(areaPedunculo):
 
         pontoX, pontoY = coordenadasX[index], coordenadasY[index]
 
-        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (255,0,0), -1)
+        cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,0,0), -1)
 
-        return pontoX, pontoY, imagemHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
-    return pontoX, pontoY, imagemHUE
+    return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
 def encontraCoordenadasMedia(areaPedunculo):
 
@@ -344,7 +367,7 @@ def encontraCoordenadasMedia(areaPedunculo):
 
     coordenadas = encontraPontosCandidatos(areaPedunculo)
 
-    coordenadasX, coordenadasY, imagemHUE = coordenadas[1], coordenadas[2], coordenadas[3]
+    coordenadasX, coordenadasY, imagemHUE, valorMaximoHUE = coordenadas[1], coordenadas[2], coordenadas[3], coordenadas[4]
     
     mediaSimplesX = np.mean(coordenadasX)
     mediaSimplesY = np.mean(coordenadasY)
@@ -354,9 +377,9 @@ def encontraCoordenadasMedia(areaPedunculo):
 
     if(verificaPonto(areaPedunculo, pontoX, pontoY)):
 
-        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (0,255,0), -1)
+        cv2.circle(imagemHUE, (pontoX, pontoY), 1, (0,255,0), -1)
 
-        return pontoX, pontoY, imagemHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
     else:
 
@@ -364,9 +387,9 @@ def encontraCoordenadasMedia(areaPedunculo):
 
         pontoX, pontoY = coordenadasX[index], coordenadasY[index]
 
-        cv2.circle(imagemHUE, (pontoX, pontoY), 6, (0,255,0), -1)
+        cv2.circle(imagemHUE, (pontoX, pontoY), 1, (0,255,0), -1)
 
-        return pontoX, pontoY, imagemHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
 def outliners(coordenadas):
 
@@ -426,10 +449,30 @@ def funcIsolationForest(coordenadas):
 
 	except ValueError:
 
+		#print("Erro IsolationForest")
+
 		return [0]
 
+def pontoCentro(areaPedunculo):
+
+	coordenadas = encontraPontosCandidatos(areaPedunculo)
+
+	imagemHUE, valorMaximoHUE = coordenadas[3], coordenadas[4]
+
+	largura = areaPedunculo.shape[1]
+	altura  = areaPedunculo.shape[0]
+
+	centroX = round(largura / 2)
+	centroY = round(altura / 2)
+
+	return int(centroX), int(centroY), imagemHUE, valorMaximoHUE
 
 def Kmeans(areaPedunculo, qtdBusca, metodo):
+
+	largura = areaPedunculo.shape[1]
+	altura  = areaPedunculo.shape[0]
+
+	qtdPontosAreaPedunculo = largura * altura * 0.7
 
 	try:
 
@@ -437,9 +480,11 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 		cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0), (50,50,50), (255,255,30)]
 
-		coordenadas, imagemHUE = pontosCandidatos[0], pontosCandidatos[3]
+		coordenadas, imagemHUE, valorMaximoHUE = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4]
 
-		if(len(coordenadas) >= qtdBusca):
+		qtdPontosEncon = len(coordenadas)
+
+		if( qtdPontosEncon >= qtdBusca and qtdPontosEncon < qtdPontosAreaPedunculo):
 
 			pontosGeral = []
 			guardaX = []
@@ -458,7 +503,7 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 			    if(verificaPonto(areaPedunculo, pontoX, pontoY)):
 
-			        cv2.circle(imagemHUE, (pontoX, pontoY), 3, (128,0,0), -1)
+			        cv2.circle(imagemHUE, (pontoX, pontoY), 1, (128,0,0), -1)
 
 			        pontosGeral.append((pontoY, pontoX))
 			        guardaX.append(pontoX)
@@ -493,7 +538,7 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 					pontoX, pontoY = int(pontoX), int(pontoY)
 
-				cv2.circle(imagemHUE, (pontoX, pontoY), 3, (255,255,255), -1)
+				cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,255,255), -1)
 
 			else:
 
@@ -522,25 +567,27 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 					pontoX, pontoY = int(pontoX), int(pontoY)
 
-				cv2.circle(imagemHUE, (pontoX, pontoY), 3, (255,255,255), -1)
+				cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,255,255), -1)
 
-			return pontoX, pontoY, imagemHUE
+			return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
 		else:
 
-			exe = encontraCoordenadasMedia(areaPedunculo)
+			poCentro = pontoCentro(areaPedunculo)
 
-			pontoX, pontoY, imagemHUE = exe[0], exe[1], exe[2]
+			pontoX, pontoY, imagemHUE, valorMaximoHUE = poCentro[0], poCentro[1], poCentro[2], poCentro[3]
 
-			return pontoX, pontoY, imagemHUE
+			return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
 	except IndexError or TypeError:
 
-		exe = encontraCoordenadasMedia(areaPedunculo)
+		poCentro = pontoCentro(areaPedunculo)
 
-		pontoX, pontoY, imagemHUE = exe[0], exe[1], exe[2]
+		print("Media central")
 
-		return pontoX, pontoY, imagemHUE
+		pontoX, pontoY, imagemHUE, valorMaximoHUE = poCentro[0], poCentro[1], poCentro[2], poCentro[3]
+
+		return pontoX, pontoY, imagemHUE, valorMaximoHUE
 
 def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos, metodo):
 
@@ -575,11 +622,11 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
 
         pontosCandidatos = encontraCoordenadasPonderada(areaPedunculo)
 
-    pontoFinalX, pontoFinalY, imagemHUE = pontosCandidatos[0], pontosCandidatos[1], pontosCandidatos[2]
+    pontoFinalX, pontoFinalY, imagemHUE, valorMaximoHUE = pontosCandidatos[0], pontosCandidatos[1], pontosCandidatos[2], pontosCandidatos[3]
 
     coordenadaFinalX = topLeftX + pontoFinalX
     coordenadaFinalY = topLeftY + pontoFinalY
 
-    return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE
+    return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE, valorMaximoHUE
 
 	
