@@ -17,7 +17,7 @@ Para utilizar o módulo faça o download do arquivo PontoPedunculo.py
 Logo em seguida, coloque-o dentro da mesma pasta do arquivo da chamada principal.
 
 ```bash
-  import PontoPedunculo as pc
+  import PC as pc
 ```
 Com isso, é possível ter acesso a todas a funções do arquivo.
 
