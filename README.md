@@ -94,6 +94,7 @@ Existe duas maneiras de remover os outliners: 1 (outliners) 2 (IsolationForest)
 
 - Modularização do código
 - Adição do método K-means para encontrar a coordenada final
+- Definição do tempo de busca para encontrar a fruta
 
 ## Utiliza
 
