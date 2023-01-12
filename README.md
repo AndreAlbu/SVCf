@@ -90,6 +90,38 @@ Existe duas maneiras de remover os outliners: 1 (outliners) 2 (IsolationForest)
 | `areaPedunculo` | `array` | imagem da região do pedunculo |
 | `imagemHUE` | `array` | imagem com os pontos candidatos marcados |
 
+
+# Banco de Imagens
+
+Local de captura: Instituto Federal de Educação Ciência e Tecnologia do Ceará, campus Crato. 
+Dia: 09 de Novembro de 2022
+Hora: 15:30 - 17:30
+Aparelho de captura: Poco X3 Pro
+Dimensões: 3000x3000
+
+**************
+### Imagens de treinamento redimensionadas para 500x500
+Imagens para treinamento: 535
+
+### Imagens de validação redimensionadas para 1500x1500
+
+Composta: 103
+
+Inclinada: 12
+
+Oclusa Manga: 149
+
+Oclusa Pedúnculo: 169
+
+Simples com Folhas no Fundo: 208
+
+Simples sem Folhas no Fundo: 249
+ 
+
+Link para acessar a base de imagens: 
+
+[Kaggle](https://www.kaggle.com/datasets/andreifce/recognition-mango)
+
 ## Melhorias
 
 - Modularização do código
