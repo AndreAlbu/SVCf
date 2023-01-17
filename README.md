@@ -94,9 +94,13 @@ Existe duas maneiras de remover os outliners: 1 (outliners) 2 (IsolationForest)
 # Banco de Imagens
 
 Local de captura: Instituto Federal de Educação Ciência e Tecnologia do Ceará, campus Crato. 
+
 Dia: 09 de Novembro de 2022
+
 Hora: 15:30 - 17:30
+
 Aparelho de captura: Poco X3 Pro
+
 Dimensões: 3000x3000
 
 **************
