@@ -132,13 +132,9 @@ Link para acessar a base de imagens:
 ## Melhorias
 
 - Modularização do código
-- Adição do método K-means para encontrar a coordenada final
-- Definição do tempo de busca para encontrar a fruta
+- Adição do método K-means para encontrar o ponto de corte
 
-## Utiliza
+## Ferramentas
 
-[OpenCV](https://opencv.org/)
-
-[Numpy](https://numpy.org/)
-
-[Matplotlib](https://matplotlib.org/)
+<img src="https://img.shields.io/badge/Opencv-8b1df2?style=for-the-badge&logo=Opencv&logoColor=white"/> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white"/>
+<img src="https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white"/> <img src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white"/> <img src="https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white"/>
