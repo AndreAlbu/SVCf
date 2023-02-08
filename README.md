@@ -8,11 +8,14 @@ com pedúnculo.
 
 - Localiza a área do pedúnculo
 - Gera pontos candidatos ao corte 
-- Função que relaciona as distância dos pontos candidatos para a seleção do mais próximo da fruta
+- Funções para encontrar o ponto de corte que utiliza:
+  - Média ponderada
+  - Média Aritmética 
+  - Kmeans
+  
+## Modo de utilizar
 
-## Instalação
-
-Para utilizar o módulo faça o download do arquivo PontoPedunculo.py
+Para utilizar o módulo faça o download do arquivo PC.py
 
 Logo em seguida, coloque-o dentro da mesma pasta do arquivo da chamada principal.
 
