@@ -9,7 +9,11 @@
 <a href="https://github.com/AndreAlbu/SVCf/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/AndreAlbu/SVCf?color=2b9348"></a>
 <a href="https://github.com/AndreAlbu/SVCf/blob/master/LICENSE"><img src="https://img.shields.io/github/license/AndreAlbu/SVCf?color=2b9348" alt="License Badge"/></a>
 
+<img alt="Exemplo da Aplicação" src="/img_banner.jpg">
+
 </div>
+
+
 
 O SVCf é um módulo para a identificação de pontos de corte em frutas
 com pedúnculo.
