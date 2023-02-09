@@ -1,5 +1,11 @@
+<h1 align="center> SVCf - Sistema de Visão Computacional para Frutas </h1>
 
-# SVCf - Sistema de Visão Computacional para Frutas
+<a href="https://github.com/AndreAlbu/SVCf/stargazers"><img src="https://img.shields.io/github/stars/AndreAlbu/SVCf" alt="Stars Badge"/></a>
+<a href="https://github.com/AndreAlbu/SVCf/network/members"><img src="https://img.shields.io/github/forks/AndreAlbu/SVCf" alt="Forks Badge"/></a>
+<a href="https://github.com/AndreAlbu/SVCf/pulls"><img src="https://img.shields.io/github/issues-pr/AndreAlbu/SVCf" alt="Pull Requests Badge"/></a>
+<a href="https://github.com/AndreAlbu/SVCf/awesome-githttps://github.com/AndreAlbu/SVCf/hub-profile-readme/issues"><img src="https://img.shields.io/github/issues/AndreAlbu/SVCf" alt="Issues Badge"/></a>
+<a href="https://github.com/AndreAlbu/SVCf/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/AndreAlbu/SVCf?color=2b9348"></a>
+<a href="https://github.com/AndreAlbu/SVCf/blob/master/LICENSE"><img src="https://img.shields.io/github/license/AndreAlbu/SVCf?color=2b9348" alt="License Badge"/></a>
 
 O SVCf é um módulo para a identificação de pontos de corte em frutas
 com pedúnculo.
