@@ -4,16 +4,18 @@ from matplotlib import pyplot as plt
 
 from sklearn.ensemble import IsolationForest
 
-
-def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa):
+def preveAreaPedunculo(posicao, xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa):
     
     """
     Função: Localizar a área do pedúnculo
 
-    Parâmetro: xt, yt, xb, yb -> correspondem as coordenadas da caixa da fruta
-               limiarLargura, limiarAltura -> determina a área do pedúnculo
+    Parâmetro: posicao -> posição da caixa do pedúnculo a cada interação
+    		   xt, yt, xb, yb -> correspondem as coordenadas da caixa da fruta
+               limiarLargura -> determina a quantidade de áreas do pedúnculo a serem geradas
+               limiarAltura -> altura da(s) do pedúnculo
 
-    Ajuste: Os limiares podem ser ajustado no intervalo de 0 a 1
+    Ajuste: O limiar de altura é ajustado no intervalo de 0 a 1
+            A limiar de largura é um número inteiro >= 1
     """
     
     #Tamanho da região de interesse baseada na caixa da fruta
@@ -24,12 +26,23 @@ def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa)
     RoiH = limiarAltura  * Hmax
 
     #Posiciona a área do pedúnculo no centro da caixa da fruta
-    centro = (xb + xt) / 2
+    tamanhoCaixaPedunculo = Lmax / limiarLargura
 
-    centroCaixa = RoiL / 2
-
-    x1 = centro - centroCaixa
-    x2 = centro + centroCaixa
+    #Posicionamento das caixas
+    if(posicao == 0):
+        
+        x1 = xt
+        x2 = x1 + tamanhoCaixaPedunculo
+        
+    elif(posicao == 1):
+        
+        x1 = xt + tamanhoCaixaPedunculo
+        x2 = x1 + tamanhoCaixaPedunculo
+        
+    else:
+        
+        x1 = xt + posicao * tamanhoCaixaPedunculo
+        x2 = x1 + tamanhoCaixaPedunculo
 
     y1 = abs(yt + alturaCaixa) 
     y2 = abs(RoiH - y1)
@@ -40,7 +53,7 @@ def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa)
     x2 = int(x2)
     y2 = int(y2)
     
-    return x1, y1, x2, y2  
+    return x1, y1, x2, y2 
 
 def histogramaHSV(image):
 
@@ -143,24 +156,25 @@ def encontraPontosCandidatos(areaPedunculo):
 					cv2.circle(areaPedunculo, (x, y), 1, (255, 0, 255), -1) #purple
 
 		quantidadePontosEncontrados = len(todas_coordenadas)
+		#print(quantidadePontosEncontrados)
 
 		if(quantidadePontosEncontrados >= 1):
 
-			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE, quantidadePontosEncontrados
 
-		else:       
+		else:
+
+			#print(f"Encontrou correto else {quantidadePontosEncontrados}")       
 
 			todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
-			#print("Nao existe pontos!!")
-
-			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+			return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE, quantidadePontosEncontrados
 
 	except:
 
-		todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
-		#print("Nao existe pontos!!")
+		#print(f"Encontrou com erro 0")
 
-		return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE
+		todas_coordenadas, todas_coordenadasX, todas_coordenadasY = [(centroX, centroY)], [(centroX)], [(centroY)]
+		return todas_coordenadas, todas_coordenadasX, todas_coordenadasY, areaPedunculo, valorMaximoHUE, 0
 
 
 
