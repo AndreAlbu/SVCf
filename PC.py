@@ -494,7 +494,7 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 		cores = [(255,255,255), (255,255,0), (255,140,0), (127,255,0), (128,0,0), (50,50,50), (255,255,30)]
 
-		coordenadas, imagemHUE, valorMaximoHUE = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4]
+		coordenadas, imagemHUE, valorMaximoHUE, qtdPontosEncontrados = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4], pontosCandidatos[5]
 
 		qtdPontosEncon = len(coordenadas)
 
@@ -583,7 +583,7 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 				cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,255,255), -1)
 
-			return pontoX, pontoY, imagemHUE, valorMaximoHUE
+			return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
 
 		else:
 
@@ -591,17 +591,17 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 			pontoX, pontoY, imagemHUE, valorMaximoHUE = poCentro[0], poCentro[1], poCentro[2], poCentro[3]
 
-			return pontoX, pontoY, imagemHUE, valorMaximoHUE
+			return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
 
 	except IndexError or TypeError:
 
 		poCentro = pontoCentro(areaPedunculo)
 
-		print("Media central")
+		print("Ponto de corte definido para o centro")
 
 		pontoX, pontoY, imagemHUE, valorMaximoHUE = poCentro[0], poCentro[1], poCentro[2], poCentro[3]
 
-		return pontoX, pontoY, imagemHUE, valorMaximoHUE
+		return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
 
 def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos, metodo):
 
@@ -636,11 +636,11 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
 
         pontosCandidatos = encontraCoordenadasPonderada(areaPedunculo)
 
-    pontoFinalX, pontoFinalY, imagemHUE, valorMaximoHUE = pontosCandidatos[0], pontosCandidatos[1], pontosCandidatos[2], pontosCandidatos[3]
+    pontoFinalX, pontoFinalY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados = pontosCandidatos[0], pontosCandidatos[1], pontosCandidatos[2], pontosCandidatos[3], pontosCandidatos[4]
 
     coordenadaFinalX = topLeftX + pontoFinalX
     coordenadaFinalY = topLeftY + pontoFinalY
 
-    return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE, valorMaximoHUE
+    return coordenadaFinalX, coordenadaFinalY, areaPedunculo, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
 
 	
