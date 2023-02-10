@@ -2,6 +2,8 @@
 
 <div align="center">
 
+<a href="https://github.com/AndreAlbu/SVCf/repo-size"><img src="https://img.shields.io/github/repo-size/AndreAlbu/SVCf" alt="Repo Size"/></a>
+<a href="https://github.com/AndreAlbu/SVCf/languages/count"><img src="https://img.shields.io/github/languages/count/AndreAlbu/SVCf" alt="Language"/></a>
 <a href="https://github.com/AndreAlbu/SVCf/stargazers"><img src="https://img.shields.io/github/stars/AndreAlbu/SVCf" alt="Stars Badge"/></a>
 <a href="https://github.com/AndreAlbu/SVCf/network/members"><img src="https://img.shields.io/github/forks/AndreAlbu/SVCf" alt="Forks Badge"/></a>
 <a href="https://github.com/AndreAlbu/SVCf/pulls"><img src="https://img.shields.io/github/issues-pr/AndreAlbu/SVCf" alt="Pull Requests Badge"/></a>
@@ -13,10 +15,7 @@
 
 </div>
 
-
-
-O SVCf é um módulo para a identificação de pontos de corte em frutas
-com pedúnculo.
+> O SVCf é um módulo para a identificação de pontos de corte em frutas com pedúnculo.
 
 ## Funcionalidades
 
@@ -152,3 +151,37 @@ Link para acessar a base de imagens:
 
 <img src="https://img.shields.io/badge/Opencv-8b1df2?style=for-the-badge&logo=Opencv&logoColor=white"/> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white"/>
 <img src="https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white"/> <img src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white"/> <img src="https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white"/>
+
+
+## 🤝 Colaboradores
+
+Agradecemos às seguintes pessoas que contribuíram para este projeto:
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="#">
+        <img src="https://avatars.githubusercontent.com/u/47752060?v=4" width="100px;" alt="Foto do André no GitHub"/><br>
+        <sub>
+          <b>André Albuquerque</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://avatars.githubusercontent.com/u/29759532?v=4" width="100px;" alt="Foto do Alan Victor"/><br>
+        <sub>
+          <b>Alan Victor</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="#">
+        <img src="https://avatars.githubusercontent.com/u/45532170?v=4" width="100px;" alt="Foto do Pedro Henrile"/><br>
+        <sub>
+          <b>Pedro Henrile</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
