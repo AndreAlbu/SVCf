@@ -185,7 +185,7 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
     </td>
     <td align="center">
       <a href="#">
-        <img src="https://avatars.githubusercontent.com/u/45532170?v=4" width="100px;" alt="Foto do Carlos Hairon"/><br>
+        <img src="https://media.licdn.com/dms/image/C5603AQHNXoDwXvcixQ/profile-displayphoto-shrink_400_400/0/1516437479738?e=1681344000&v=beta&t=0wQCUuqDDE_O75l9hICDB8dYEoQ5XyJ-5RXvPT14w84" width="100px;" alt="Foto do Carlos Hairon"/><br>
         <sub>
           <b>Carlos Hairon</b>
         </sub>
