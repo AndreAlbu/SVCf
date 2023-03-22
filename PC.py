@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from sklearn.ensemble import IsolationForest
+from sklearn.cluster import DBSCAN
 
 def preveAreaPedunculo(posicao, xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa):
     
@@ -16,7 +17,6 @@ def preveAreaPedunculo(posicao, xt, yt, xb, yb, limiarLargura, limiarAltura, alt
 
     Ajuste: O limiar de altura é ajustado no intervalo de 0 a 1
             A limiar de largura é um número inteiro >= 1
-    """
     
     #Tamanho da região de interesse baseada na caixa da fruta
     Lmax = abs(xt - xb)
@@ -54,6 +54,34 @@ def preveAreaPedunculo(posicao, xt, yt, xb, yb, limiarLargura, limiarAltura, alt
     y2 = int(y2)
     
     return x1, y1, x2, y2 
+
+    """
+
+    #Tamanho da região de interesse baseada na caixa da fruta
+    Lmax = abs(xt - xb)
+    Hmax = abs(yt - yb)
+
+    RoiL = limiarLargura * Lmax
+    RoiH = limiarAltura  * Hmax
+
+    #Posiciona a área do pedúnculo no centro da caixa da fruta
+    centro = (xb + xt) / 2
+
+    centroCaixa = RoiL / 2
+
+    x1 = centro - centroCaixa
+    x2 = centro + centroCaixa
+
+    y1 = abs(yt + alturaCaixa) 
+    y2 = abs(RoiH - y1)
+
+    #Converte todas as coordenadas para um número inteiro
+    x1 = int(x1)
+    y1 = int(y1)
+    x2 = int(x2)
+    y2 = int(y2)
+    
+    return x1, y1, x2, y2
 
 def histogramaHSV(image):
 
@@ -293,6 +321,8 @@ def encontraCoordenadasPonderada(areaPedunculo):
 
     todasCoordenadas, coordenadasX, coordenadasY, imagemHUE, valorMaximoHUE = coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3], coordenadas[4]
 
+    quantidadePontosEncontrados = len(todasCoordenadas)
+
     pesoY  =  []
     pesoX  =  []
     mediaX =  []
@@ -353,7 +383,7 @@ def encontraCoordenadasPonderada(areaPedunculo):
 
         cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,0,0), -1)
 
-        return pontoX, pontoY, imagemHUE, valorMaximoHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE, quantidadePontosEncontrados
 
     else:
 
@@ -363,9 +393,9 @@ def encontraCoordenadasPonderada(areaPedunculo):
 
         cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,0,0), -1)
 
-        return pontoX, pontoY, imagemHUE, valorMaximoHUE
+        return pontoX, pontoY, imagemHUE, valorMaximoHUE, quantidadePontosEncontrados
 
-    return pontoX, pontoY, imagemHUE, valorMaximoHUE
+    return pontoX, pontoY, imagemHUE, valorMaximoHUE, quantidadePontosEncontrados
 
 def encontraCoordenadasMedia(areaPedunculo):
 
@@ -603,7 +633,96 @@ def Kmeans(areaPedunculo, qtdBusca, metodo):
 
 		return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
 
-def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos, metodo):
+def funcao_DBSCAN(areaPedunculo, eps, min_samples):
+
+	try:
+
+		pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+
+		coordenadas, imagemHUE, valorMaximoHUE, qtdPontosEncontrados = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4], pontosCandidatos[5]
+
+		coordenadas = np.array(coordenadas)
+
+		#print(coordenadas)
+
+		dbscan = DBSCAN(eps = eps, min_samples = min_samples)
+
+		dbscan.fit(coordenadas)
+
+		labels = dbscan.labels_
+
+		n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+
+		centers = []
+
+		for i in range(n_clusters):
+
+			#indices = np.where(labels == i)[0]
+			#indices = np.array(indices, dtype=int)
+			cluster_points = coordenadas[labels == i]
+			#cluster_points = coordenadas[indices]
+			center = np.mean(cluster_points, axis=0)
+			center = center.astype(int)
+			cv2.circle(imagemHUE, (center), 1, (128,0,0), -1)
+			centers.append(center)
+
+		centers = sorted(centers, key=lambda coordenadas: coordenadas[1])
+
+		#print(centers)
+
+		isolation = funcIsolationForest(centers)
+
+		#print(isolation)
+
+		tamanho = len(isolation)
+
+		if(tamanho > 0):
+
+			posicao = round((tamanho / 2) + 1)
+
+			for i in range(tamanho - 1):
+
+				#print(f"iso {isolation[i][0]} - {isolation[i][1]}")
+
+				cv2.line(imagemHUE, (isolation[i][0], isolation[i][1]), (isolation[i+1][0], isolation[i+1][1]), (255, 0, 0), 2)
+			
+			pontoX, pontoY = isolation[posicao][0], isolation[posicao][1]
+
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		else:
+
+			idx = guardaX.index(np.max(guardaX))
+
+			pontoX, pontoY = isolation[idx], isolation[idx]
+
+			pontoX, pontoY = int(pontoX), int(pontoY)
+
+		cv2.circle(imagemHUE, (pontoX, pontoY), 1, (255,255,255), -1)
+
+
+		#coordenada_ordenada = sorted(centers, key=lambda coord: coord[1])
+
+		#max_coord = max(coordenada_ordenada, key=lambda coord: coord[1])
+
+		#print(coordenada_ordenada)
+		#print(f"Max {max_coord}")
+		#print(f"Quantidade DBSCAN: {len(centers)} ")
+
+		return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
+
+	except IndexError or TypeError:
+
+		poCentro = pontoCentro(areaPedunculo)
+
+		print("Ponto de corte definido para o centro")
+
+		pontoX, pontoY, imagemHUE, valorMaximoHUE = poCentro[0], poCentro[1], poCentro[2], poCentro[3]
+
+		return pontoX, pontoY, imagemHUE, valorMaximoHUE, qtdPontosEncontrados
+
+
+def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBusca, qtdPontos, metodo, esp, min_samples):
 
     """
     Função: Encontra o ponto final na imagem original
@@ -631,6 +750,10 @@ def coordenadaPontoFinal(areaPedunculo, baixo, alto, topLeftX, topLeftY, tipoBus
     elif(tipoBusca == "Media"):
 
         pontosCandidatos = encontraCoordenadasMedia(areaPedunculo)
+
+    elif(tipoBusca == 'DBSCAN'):
+
+    	pontosCandidatos = funcao_DBSCAN(areaPedunculo, esp, min_samples)
 
     else:
 
