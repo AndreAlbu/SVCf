@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import json
 
 from sklearn.ensemble import IsolationForest
 from sklearn.cluster import DBSCAN
