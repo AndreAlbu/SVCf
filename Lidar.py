@@ -7,6 +7,7 @@
     Autor:
       Hairon Gonçalves
       André Albuquerque
+      Alan Paulino
 
     Data de Criação:
     Criação: 05/01/2024
