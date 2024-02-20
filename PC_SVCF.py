@@ -763,7 +763,7 @@ def seleciona_ponto_altura_correta(ponto1, altura, cm_px, fator_imgs_3D):
 
 	return ponto2
 
-def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, cm_px, fator_imgs_3D, pontoCentroTopoCaixa, TopLeftX, TopLeftY, altura_minima_ponto):
+def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, cm_px, fator_imgs_3D, pontoCentroTopoCaixa, TopLeftX, TopLeftY, altura_minima_ponto, metodo):
     
     qtdPontoCorretosCorte    = 0
 
@@ -808,7 +808,7 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
             
         print("Não existe pontos candidatos")
 
-    if(qtdPontoCorretosCorte < 1):
+    if(qtdPontoCorretosCorte < 1):    		
 
     	altura_area_pedunculo  = area_pedunculo.shape[0]
     	largura_area_pedunculo = area_pedunculo.shape[1]
@@ -818,6 +818,12 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 
     	x_centro_caixa_erro = int(x_centro_caixa_erro)
     	y_centro_caixa_erro = int(y_centro_caixa_erro)
+
+    	if(metodo == "Heuristica" and len(coordenadasCandidatas) > 0):
+
+    		print("Usando o primeiro ponto como referencia")
+
+    		x_centro_caixa_erro = coordenadasCandidatas[0][0]
 
     	coord_altura_correta = seleciona_ponto_altura_correta((x_centro_caixa_erro, y_centro_caixa_erro), altura_minima_ponto, cm_px, fator_imgs_3D)
 
@@ -943,7 +949,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	print(f"Fator cm_px: {fator_cm_px}")
 
-    	candidatos_corretos = seleciona_candidatos_3D(imagemHUE_, coordenadas_clusterizadas, pontosJson, fator_cm_px, fator_imgs_3D, pontoCentroTopoCaixa, topLeftX, topLeftY, alturaMinima)
+    	candidatos_corretos = seleciona_candidatos_3D(imagemHUE_, coordenadas_clusterizadas, pontosJson, fator_cm_px, fator_imgs_3D, pontoCentroTopoCaixa, topLeftX, topLeftY, alturaMinima, metodoCluster)
 
     	coordenadas_corretas, distancias_correta, imagemHueCorreta,  = candidatos_corretos[0], candidatos_corretos[1], candidatos_corretos[2]
 
