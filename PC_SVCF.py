@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import traceback
 
 from sklearn.ensemble import IsolationForest
 from sklearn.cluster import DBSCAN
@@ -62,7 +63,7 @@ def preveAreaPedunculo(xt, yt, xb, yb, limiarLargura, limiarAltura, alturaCaixa)
     
     return x1, y1, x2, y2
 
-def histogramaHSV(area_pedunculo):
+def histogramaHSV(area_pedunculo, caminhoSalva):
 
 	"""
 	Função: Encontrar o maior valor do histograma na componente HUE
@@ -92,10 +93,14 @@ def histogramaHSV(area_pedunculo):
 		plt.xlabel("Valor de HUE")
 		plt.ylabel("Frequência")
 
-		plt.axvline(x = valorHue, linestyle = '--', color = 'green')
+		plt.axvline(x = valorHue, linestyle = '--', color = 'green', label = 'Valor máximo: ' + str(valorHue))
 
-		#Salvar o histograma como uma imagem
-		plt.savefig("Teste_Codigo/histograma_HSV.png")
+		plt.legend()
+
+		if(not (caminhoSalva is None)):
+
+			#Salvar o histograma como uma imagem
+			plt.savefig(caminhoSalva + "b_histograma_HSV.png")
 
 		plt.clf()
  
@@ -144,7 +149,7 @@ def segmentaAreaPedunculo(areaPedunculo, limiarBaixo, limiarAlto):
 		print("Erro na função: Segmenta Area Pedunculo")
 		return areaPedunculo
 
-def encontraPontosCandidatos(areaPedunculo):
+def encontraPontosCandidatos(areaPedunculo, caminhoSalva):
 
 	"""
 	Função: Encontra os pontos candidatos ao corte
@@ -169,9 +174,7 @@ def encontraPontosCandidatos(areaPedunculo):
 
 		areaPedunculo = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV) #Converte a imagem para HSV
 
-		cv2.imwrite("Teste_Codigo/ped_a_hsv.jpg", areaPedunculo)
-
-		valorMaximoHUE = histogramaHSV(areaPedunculo)
+		valorMaximoHUE = histogramaHSV(areaPedunculo,caminhoSalva)
 
 		todas_coordenadas  =  [ ] #Guarda todas as coordenadas (eixo X e Y)
 		todas_coordenadasX =  [ ] #Guarda as coordenadas do eixo X vindas dos cantos encontrados
@@ -189,7 +192,11 @@ def encontraPontosCandidatos(areaPedunculo):
 					todas_coordenadasX.append(int(x))
 					todas_coordenadasY.append(int(y))
 
-					cv2.circle(areaPedunculo, (x, y), 1, (255, 0, 255), -1)
+					cv2.circle(areaPedunculo, (x, y), 1, (255, 0, 0), -1)
+
+		if(not (caminhoSalva is None)):
+
+			cv2.imwrite(caminhoSalva + "c_pontos_candidatos.jpg", areaPedunculo)
 
 		quantidadePontosEncontrados = len(todas_coordenadas)
 
@@ -232,6 +239,15 @@ def funcao_coordenada_central(areaPedunculo):
 
 	return coordenadas
 
+def gerar_cor_contraste():
+
+    while True:
+
+        color = tuple(np.random.randint(0, 255, 3))
+        
+        if (color[1] > 50 and color[1] > color[0] and color[1] > color[2] and (abs(color[0] - color[1]) > 30 or abs(color[0] - color[2]) > 30)):
+
+            return color
 #####################################################################################################
 #																									#
 #								 FUNCOES PARA UTILIZAR HEURISTICA  									#
@@ -301,11 +317,11 @@ def calculaMediaPontos(pontos):
     
     return calMedia
 
-def funcao_heuristica(areaPedunculo):
+def funcao_heuristica(areaPedunculo, caminhoSalva):
 
 	print("Função --> Função Heuristica")
 
-	coordenadas = encontraPontosCandidatos(areaPedunculo)
+	coordenadas = encontraPontosCandidatos(areaPedunculo, caminhoSalva)
 
 	todasCoordenadas, coordenadasX, coordenadasY, imagemHUE, valorMaximoHUE = coordenadas[0], coordenadas[1], coordenadas[2], coordenadas[3], coordenadas[4]
 
@@ -392,7 +408,7 @@ def funcao_heuristica(areaPedunculo):
 #																									#
 #####################################################################################################
 
-def funcao_kmeans(areaPedunculo, qtdBusca):
+def funcao_kmeans(areaPedunculo, qtdBusca, caminhoSalva):
 
 	print("Função: --> Método Kmeans")
 
@@ -401,9 +417,11 @@ def funcao_kmeans(areaPedunculo, qtdBusca):
 
 	coordenadas_retorno = [ ]
 
+	quantidade_clusters_selecionados = 0
+
 	try:
 
-		pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+		pontosCandidatos = encontraPontosCandidatos(areaPedunculo, caminhoSalva)
 
 		coordenadas, imagemHUE, valorMaximoHUE, qtdPontosEncontrados = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4], pontosCandidatos[5]
 
@@ -423,10 +441,27 @@ def funcao_kmeans(areaPedunculo, qtdBusca):
 
 			for i in range(qtdBusca):
 
+				color = gerar_cor_contraste()
+
+				color = (int(color[0]), int(color[1]), int(color[2]))
+
+				coordenadas_np = np.array(coordenadas)
+
+				for j in range(len(coordenadas)):
+
+					if label[j] == i:
+
+						ponto = coordenadas_np[j].astype(int)
+						pontoX_cluster = ponto[0]
+						pontoY_cluster = ponto[1]
+
+						cv2.circle(imagemHUE, (pontoX_cluster, pontoY_cluster), 1, color, -1)
+
 				pontoX = int(center[:,0][i])
 				pontoY = int(center[:,1][i])
 
-				cv2.circle(imagemHUE, (pontoX, pontoY), 3, (0, 255, 255), -1)
+				cv2.circle(imagemHUE, (pontoX, pontoY), 3, color, -1)
+				cv2.circle(imagemHUE, (pontoX, pontoY), 4, (255, 255, 255), 1)        
 
 				pontosGeral.append((pontoX, pontoY))
 				guardaX.append(pontoX)
@@ -446,6 +481,8 @@ def funcao_kmeans(areaPedunculo, qtdBusca):
 
 	except:
 
+		traceback.print_exc()
+
 		print("Erro desconhecido: Função --> Método Kmeans")
 
 		coodenadas_erro = funcao_coordenada_central(areaPedunculo)
@@ -456,11 +493,11 @@ def funcao_kmeans(areaPedunculo, qtdBusca):
 
 #####################################################################################################
 #																									#
-#							      FUNCOES PARA UTILIZAR O KMEANS    								#
+#							      FUNCOES PARA UTILIZAR O DBSCAN    								#
 #																									#
 #####################################################################################################
 
-def localizaEps(k, coordenadas):
+def localizaEps(k, coordenadas, caminhoSalva):
     
     if(len(coordenadas) <= k):
         
@@ -499,7 +536,10 @@ def localizaEps(k, coordenadas):
 	       	plt.ylabel("Distância do 4° Vizinho Mais Próximo")
 
 	        plt.text(epsilon, eps-2.5, f'eps = {eps}')
-	        plt.savefig("Teste_Codigo/curva_eps.png")
+
+	        if(not (caminhoSalva is None)):
+
+	        	plt.savefig(caminhoSalva + "_curva_eps.png")
 
 	        plt.clf()
 
@@ -513,7 +553,7 @@ def localizaEps(k, coordenadas):
 
     	return eps
 
-def funcao_dbscan(areaPedunculo, min_samples):
+def funcao_dbscan(areaPedunculo, min_samples, caminhoSalva):
 
 	print("Função: --> Método DBSCAN")
 
@@ -521,13 +561,13 @@ def funcao_dbscan(areaPedunculo, min_samples):
 
 	try:
 
-		pontosCandidatos = encontraPontosCandidatos(areaPedunculo)
+		pontosCandidatos = encontraPontosCandidatos(areaPedunculo, caminhoSalva)
 
 		coordenadas, imagemHUE, valorMaximoHUE, qtdPontosEncontrados = pontosCandidatos[0], pontosCandidatos[3], pontosCandidatos[4], pontosCandidatos[5]
 
 		coordenadas = np.array(coordenadas)
 
-		eps = localizaEps(min_samples, coordenadas)
+		eps = localizaEps(min_samples, coordenadas, caminhoSalva)
 
 		dbscan = DBSCAN(eps = eps, min_samples = min_samples)
 
@@ -550,7 +590,9 @@ def funcao_dbscan(areaPedunculo, min_samples):
 
 				pontos_clusters = pontos_clusters.astype(int)
 
-				color = tuple(map(int, np.random.randint(0, 255, 3)))
+				color = gerar_cor_contraste()
+
+				color = (int(color[0]), int(color[1]), int(color[2]))
 
 				for j in range(len(pontos_clusters)):
 
@@ -560,7 +602,8 @@ def funcao_dbscan(areaPedunculo, min_samples):
 
 				centroids.append((centroi))
 
-				cv2.circle(imagemHUE, (centroi), 3, (0, 255, 255), -1)
+				cv2.circle(imagemHUE, (centroi), 3, color, -1)
+				cv2.circle(imagemHUE, (centroi), 4, (255, 255, 255), 1)
 
 			coordenadas_retorno = centroids
 
@@ -577,6 +620,8 @@ def funcao_dbscan(areaPedunculo, min_samples):
 	except:
 
 		print("Erro desconhecido: Função --> Método DBSCAN")
+
+		traceback.print_exc()
 
 		coodenadas_erro = funcao_coordenada_central(areaPedunculo)
 
@@ -661,7 +706,7 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 			for i_isolation in range(tamanho_isolation):
 				
-				cv2.circle(imagemHUE, (isolation[i_isolation][0], isolation[i_isolation][1]), 3, (255, 0, 0), 2)
+				cv2.circle(imagemHUE, (isolation[i_isolation][0], isolation[i_isolation][1]), 5, (0, 255, 255), 2)
 
 			coordenadas_pontos_dc = isolation
 
@@ -689,7 +734,7 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 			for i_outliners in range(tamanho_outliners):
 
-				cv2.circle(imagemHUE, (outLin[i_outliners][0], outLin[i_outliners][1]), 3, (255, 0, 0), 2)
+				cv2.circle(imagemHUE, (outLin[i_outliners][0], outLin[i_outliners][1]), 5, (0, 255, 255), 2)
 
 			coordenadas_pontos_dc = outLin
 
@@ -860,7 +905,7 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		index = 0
 
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (139, 0, 0), 2)
+		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
 	elif(posicao == "center"):
 
@@ -868,7 +913,7 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		index = (tamanho_coordenadas // 2)
 
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (139, 0, 0), 2)
+		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
 	else:
 
@@ -876,7 +921,7 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		index = tamanho_coordenadas - 1
 
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (139, 0, 0), 2)
+		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
 	if(tipoBase == "3D"):
 
@@ -907,17 +952,19 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
     fator_imgs_3D = 7.5
     distancia_ponto_final = -1
 
+    caminhoSalva = caminhoSalva + id_imagem + "_" + id_manga_localizada + "_"
+
     if(metodoCluster == "Kmeans"):
 
-        resultado_clusterizacao = funcao_kmeans(areaPedunculo, quantidadeBusca)
+        resultado_clusterizacao = funcao_kmeans(areaPedunculo, quantidadeBusca, caminhoSalva)
 
     elif(metodoCluster == 'DBSCAN'):
 
-    	resultado_clusterizacao = funcao_dbscan(areaPedunculo, min_samples)
+    	resultado_clusterizacao = funcao_dbscan(areaPedunculo, min_samples, caminhoSalva)
 
     else:
 
-    	resultado_clusterizacao = funcao_heuristica(areaPedunculo)
+    	resultado_clusterizacao = funcao_heuristica(areaPedunculo, caminhoSalva)
 
     coordenadas_clusterizadas, imagemHUE, valorHue, qtdPontosEncontrados = resultado_clusterizacao[0], resultado_clusterizacao[1], resultado_clusterizacao[2], resultado_clusterizacao[3]
 
@@ -955,6 +1002,8 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	imagemHueCorreta_ = imagemHueCorreta.copy()
 
+    	imagemHueDC = imagemHueCorreta.copy()
+
     	if(removePontos and metodoCluster != "Heuristica"):
 
 	    	pontos_dentro_curva = remove_pontos_dc(coordenadas_corretas, imagemHUE, metodoFC)
@@ -963,7 +1012,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueCorreta_, posicaoDesejada, distancias_correta, tipoBase)
+    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, posicaoDesejada, distancias_correta, tipoBase)
 
     	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2]
 
@@ -972,16 +1021,16 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     if(not (caminhoSalva is None)):
             
-    	cv2.imwrite(caminhoSalva + id_imagem + "_" + id_manga_localizada + "_" + "ped_b_candidatos.jpg", imagemHUE_)
-    	cv2.imwrite(caminhoSalva + id_imagem + "_" + id_manga_localizada + "_" + "ped_d_ponto_final.jpg", imagemHueD_)
+    	cv2.imwrite(caminhoSalva + "d_clusterizacao.jpg", imagemHUE_)
+    	cv2.imwrite(caminhoSalva + "g_ponto_final.jpg", imagemHueD_)
 
     	if(removePontos and metodoCluster != "Heuristica"):
 
-    		cv2.imwrite(caminhoSalva + id_imagem + "_" + id_manga_localizada + "_" + "ped_c_clusters.jpg", imagemHueDC_)
+    		cv2.imwrite(caminhoSalva + "f_dentro_curva.jpg", imagemHueDC_)
 
     	if(tipoBase == "3D"):
 
-    		cv2.imwrite(caminhoSalva + id_imagem + "_" + id_manga_localizada + "_" + "ped_c_distancias.jpg", imagemHueCorreta)
+    		cv2.imwrite(caminhoSalva + "e_verificacao_distancias.jpg", imagemHueCorreta)
 
     coordenadaFinalX = topLeftX + pontoFinalX
     coordenadaFinalY = topLeftY + pontoFinalY
