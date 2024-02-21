@@ -81,7 +81,20 @@ def histogramaHSV(area_pedunculo, caminhoSalva):
 
 		# Obtém o maior valor do histograma
 		ymax = max(histograma)
+
 		xmax, _ = np.where(histograma == ymax)
+
+		xmax = xmax[0]
+
+		if(xmax > 0):
+
+			valorHue = int(xmax)
+
+		else:
+
+			xmax = 2
+
+			histograma = 2
 
 		valorHue = int(xmax)
 
@@ -108,9 +121,11 @@ def histogramaHSV(area_pedunculo, caminhoSalva):
 
 	except TypeError:
 
-		print("Erro na função: Valor = 20")
+		traceback.print_exc()
 
-		return 20
+		print("Erro na função: Valor = 2")
+
+		return 2
 
 def segmentaAreaPedunculo(areaPedunculo, limiarBaixo, limiarAlto):
 
