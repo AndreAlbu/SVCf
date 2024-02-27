@@ -1,3 +1,35 @@
+"""
+    Nome do Módulo: PC_SVCF
+
+    Descrição:
+      Este módulo contém funções para encontrar o ponto de corte final em pedúnculos no contexto do Projeto SVCF.
+
+    Autor:
+      Hairon Gonçalves
+      André Albuquerque
+
+    Data de Criação:
+    Criação: 19/02/2024
+    Última Modificação: 26/02/2024
+
+    Requisitos:
+        Bibliotecas:
+           - Opencv
+           - Numpy
+           - Json
+           - Matplotlib
+           - Scikit-Learn
+           - SciPy
+           - kneed
+           - Lidar
+            
+    Licença:
+      Licença MIT
+
+    Notas:
+      Essa biblioteca faz parte do Projeto SVCF
+"""
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -84,7 +116,7 @@ def histogramaHSV(area_pedunculo, caminhoSalva):
 
 		xmax, _ = np.where(histograma == ymax)
 
-		xmax = xmax[0]
+		xmax = max(xmax)
 
 		if(xmax > 0):
 
@@ -113,7 +145,7 @@ def histogramaHSV(area_pedunculo, caminhoSalva):
 		if(not (caminhoSalva is None)):
 
 			#Salvar o histograma como uma imagem
-			plt.savefig(caminhoSalva + "b_histograma_HSV.png")
+			plt.savefig(caminhoSalva + "c_histograma_HSV.png")
 
 		plt.clf()
  
@@ -211,7 +243,7 @@ def encontraPontosCandidatos(areaPedunculo, caminhoSalva):
 
 		if(not (caminhoSalva is None)):
 
-			cv2.imwrite(caminhoSalva + "c_pontos_candidatos.jpg", areaPedunculo)
+			cv2.imwrite(caminhoSalva + "d_pontos_candidatos.jpg", areaPedunculo)
 
 		quantidadePontosEncontrados = len(todas_coordenadas)
 
@@ -1036,18 +1068,18 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     if(not (caminhoSalva is None)):
             
-    	cv2.imwrite(caminhoSalva + "d_clusterizacao.jpg", imagemHUE_)
-    	cv2.imwrite(caminhoSalva + "g_ponto_final.jpg", imagemHueD_)
+    	cv2.imwrite(caminhoSalva + "e_clusterizacao.jpg", imagemHUE_)
+    	cv2.imwrite(caminhoSalva + "h_ponto_final.jpg", imagemHueD_)
 
     	if(removePontos and metodoCluster != "Heuristica"):
 
-    		cv2.imwrite(caminhoSalva + "f_dentro_curva.jpg", imagemHueDC_)
+    		cv2.imwrite(caminhoSalva + "g_dentro_curva.jpg", imagemHueDC_)
 
     	if(tipoBase == "3D"):
 
-    		cv2.imwrite(caminhoSalva + "e_verificacao_distancias.jpg", imagemHueCorreta)
+    		cv2.imwrite(caminhoSalva + "f_verificacao_distancias.jpg", imagemHueCorreta)
 
     coordenadaFinalX = topLeftX + pontoFinalX
     coordenadaFinalY = topLeftY + pontoFinalY
     
-    return coordenadaFinalX, coordenadaFinalY, areaPedunculo, valorHue, distancia_ponto_final
+    return coordenadaFinalX, coordenadaFinalY, valorHue, distancia_ponto_final
