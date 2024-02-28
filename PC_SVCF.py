@@ -739,7 +739,7 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 	coordenadas_pontos_dc = [ ]
 
-	if(metodo == 1):
+	if(metodo == "IsolationForest"):
 
 		isolation = remove_pontos_fc_isolation_forest(coordenadas)
 
@@ -765,7 +765,7 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 			coordenadas_pontos_dc = coodenadas_erro
 
-	elif(metodo == 2):
+	elif(metodo == "Outliners"):
 
 		limite = 1
 
@@ -857,7 +857,7 @@ def seleciona_ponto_altura_correta(ponto1, altura, cm_px, fator_imgs_3D):
 
 def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, cm_px, fator_imgs_3D, pontoCentroTopoCaixa, TopLeftX, TopLeftY, altura_minima_ponto, metodo):
     
-    qtdPontoCorretosCorte    = 0
+    qtdPontoCorretosCorte = 0
 
     print("Função: --> Seleciona pontos 3D")
 
@@ -943,6 +943,10 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 	indeces_ordenadas = np.argsort(coordenadas_np[:, 1])
 
 	coordenadas_ordenadas = coordenadas_np[indeces_ordenadas]
+
+	distancias_correta_np = np.array(distancias_correta)
+
+	distancias_correta = distancias_correta_np[indeces_ordenadas]
 
 	tamanho_coordenadas = len(coordenadas_ordenadas)
 
@@ -1045,7 +1049,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	candidatos_corretos = seleciona_candidatos_3D(imagemHUE_, coordenadas_clusterizadas, pontosJson, fator_cm_px, fator_imgs_3D, pontoCentroTopoCaixa, topLeftX, topLeftY, alturaMinima, metodoCluster)
 
-    	coordenadas_corretas, distancias_correta, imagemHueCorreta,  = candidatos_corretos[0], candidatos_corretos[1], candidatos_corretos[2]
+    	coordenadas_corretas, distancias_correta, imagemHueCorreta = candidatos_corretos[0], candidatos_corretos[1], candidatos_corretos[2]
 
     	imagemHueCorreta_ = imagemHueCorreta.copy()
 
