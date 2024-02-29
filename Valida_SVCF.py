@@ -154,13 +154,11 @@ def encontra_area_px_ponto_corte(coord, cm_px, fator_imgs):
 #																									#
 #####################################################################################################
 
-def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base, coordenada_manga_ia, coordenada_pedunculo, arquivo_json, fator_cm_px, coordenadas_ponto, distancia_minima, distancia_ponto):
+def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base, coordenada_manga_ia, coordenada_pedunculo, arquivo_json, fator_cm_px, coordenadas_ponto, distancia_minima, distancia_ponto, cm_px_2D, fator_ponto_area):
 
 	fator_imgs = 7.5
 
 	distancia_horizontal = 0
-
-	cm_px_2D = 10
 
 	porcentagem_pedunculo = -1
 
@@ -203,7 +201,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		inclinacao = coordenadas_conhecidas[3]
 
-		#Verifica se o pedúnculo NÂO é inclinado
+		#Verifica se o pedúnculo NAO é inclinado
 		if(inclinacao == 0):
 
 			xtP, ytP, xbP, ybP = coordenadas_conhecidas[1][0][0], coordenadas_conhecidas[1][0][1], coordenadas_conhecidas[1][0][2], coordenadas_conhecidas[1][0][3]
@@ -229,7 +227,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		xtPC, ytPC = coordenadas_conhecidas[2][0][0], coordenadas_conhecidas[2][0][1]
 
-		area_px_ponto = encontra_area_px_ponto_corte(1, fator_cm_px, fator_imgs)
+		area_px_ponto = encontra_area_px_ponto_corte(fator_ponto_area, fator_cm_px, fator_imgs)
 
 		cv2.circle(imagem, (xtPC, ytPC), 2, (0, 0, 255), -2)
 		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 0, 255), 2)
