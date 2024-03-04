@@ -837,7 +837,7 @@ def obter_cm_px(numero_raios, tamanho, x, y, pontosJson):
 
 def calcula_distancias_entre_pontos(ponto1, ponto2, pontosJson, cm_px):
 
-	distancia_p1_p2 = (( (ponto1[0] - ponto2[0]) ** 2) + ((ponto1[1] - ponto2[1]) ** 2)) ** 0.5
+	distancia_p1_p2 = (((ponto1[0] - ponto2[0]) ** 2) + ((ponto1[1] - ponto2[1]) ** 2)) ** 0.5
 
 	distancia_final = distancia_p1_p2 * cm_px
 
@@ -847,7 +847,7 @@ def seleciona_ponto_altura_correta(ponto1, altura, cm_px, fator_imgs_3D):
 
 	print("O ponto foi definido para o centro")
 
-	ponto2_y = int((ponto1[1] - (altura / cm_px)))
+	ponto2_y = int((ponto1[1] - (fator_imgs_3D * altura / cm_px)))
 
 	ponto2_x = ponto1[0]
 
@@ -882,7 +882,7 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
             
             if(distanciaPontoCandidato >= altura_minima_ponto):
                 
-                print(f"PCan <--> TC {distanciaPontoCandidato}")
+                #print(f"PCan <--> TC {distanciaPontoCandidato}")
                 
                 qtdPontoCorretosCorte += 1
                 
@@ -900,26 +900,21 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
             
         print("Não existe pontos candidatos")
 
-    if(qtdPontoCorretosCorte < 1):    		
+    if(qtdPontoCorretosCorte < 1):   
 
-    	altura_area_pedunculo  = area_pedunculo.shape[0]
-    	largura_area_pedunculo = area_pedunculo.shape[1]
+    	print("Ponto no centro do area do pedúnculo") 		
 
-    	x_centro_caixa_erro = round(largura_area_pedunculo / 2)
-    	y_centro_caixa_erro = round(altura_area_pedunculo / 2)
+    	altura_correta = altura_minima_ponto / cm_px * fator_imgs_3D
 
-    	x_centro_caixa_erro = int(x_centro_caixa_erro)
-    	y_centro_caixa_erro = int(y_centro_caixa_erro)
+    	x_erro, y_erro = pontoCentroTopoCaixa[0], pontoCentroTopoCaixa[1]
+
+    	x_erro, y_erro = int(x_erro - TopLeftX), int(y_erro - TopLeftY)
 
     	if(metodo == "Heuristica" and len(coordenadasCandidatas) > 0):
 
-    		print("Usando o primeiro ponto como referencia")
+    		x_erro = int(coordenadasCandidatas[0][0])
 
-    		x_centro_caixa_erro = coordenadasCandidatas[0][0]
-
-    	coord_altura_correta = seleciona_ponto_altura_correta((x_centro_caixa_erro, y_centro_caixa_erro), altura_minima_ponto, cm_px, fator_imgs_3D)
-
-    	cv2.circle(area_pedunculo_copy, (coord_altura_correta), 5, (0, 255, 255), -1)
+    	coord_altura_correta = (x_erro, int(y_erro - altura_correta))
 
     	coordenadas_proximas.append((coord_altura_correta))
 
@@ -943,10 +938,6 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 	indeces_ordenadas = np.argsort(coordenadas_np[:, 1])
 
 	coordenadas_ordenadas = coordenadas_np[indeces_ordenadas]
-
-	distancias_correta_np = np.array(distancias_correta)
-
-	distancias_correta = distancias_correta_np[indeces_ordenadas]
 
 	tamanho_coordenadas = len(coordenadas_ordenadas)
 
@@ -975,6 +966,10 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
 	if(tipoBase == "3D"):
+
+		distancias_correta_np = np.array(distancias_correta)
+
+		distancias_correta = distancias_correta_np[indeces_ordenadas]
 
 		distancia_ponto_final = distancias_correta[index]
 
@@ -1045,7 +1040,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	fator_cm_px = obter_cm_px(4, 2, centroMangaX, centroMangaY, pontosJson)
 
-    	print(f"Fator cm_px: {fator_cm_px}")
+    	#print(f"Fator cm_px: {fator_cm_px}")
 
     	candidatos_corretos = seleciona_candidatos_3D(imagemHUE_, coordenadas_clusterizadas, pontosJson, fator_cm_px, fator_imgs_3D, pontoCentroTopoCaixa, topLeftX, topLeftY, alturaMinima, metodoCluster)
 
