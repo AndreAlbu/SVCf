@@ -159,6 +159,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 	fator_imgs = 7.5
 
 	distancia_horizontal = 0
+	distanciaPontoConhecido = 0
 
 	porcentagem_pedunculo = -1
 
@@ -208,7 +209,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 	
 			cv2.rectangle(imagem, (int(xtP - cm_px_2D), int(ytP)), (int(xbP + cm_px_2D), int(ybP)), (0, 255, 255,), 1)
 
-			if((pontoX >= xtP - cm_px_2D) and (pontoX <= xbP + cm_px_2D)):
+			if((pontoX >= xtP - cm_px_2D) and (pontoX <= xbP + cm_px_2D) and (pontoY >= ytP - cm_px_2D) and (pontoY <= ybP + cm_px_2D)):
 
 				porcentagem_ponto = 100.0
 
@@ -229,7 +230,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		area_px_ponto = encontra_area_px_ponto_corte(fator_ponto_area, fator_cm_px, fator_imgs)
 
-		cv2.circle(imagem, (xtPC, ytPC), 2, (0, 0, 255), -2)
+		cv2.circle(imagem, (xtPC, ytPC), 2, (0, 255, 255), -2)
 		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 0, 255), 2)
 
 		cv2.rectangle(imagem, (int(xtPC - area_px_ponto), int(ytPC - area_px_ponto)), (int(xtPC + area_px_ponto), int(ytPC + area_px_ponto)), (0, 255, 255,), 1)
@@ -242,15 +243,15 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 			if((pontoX >= (xtPC - area_px_ponto) and pontoX <= (xtPC + area_px_ponto))):
 
-				porcentagem_ponto += 49.9
+				porcentagem_ponto += 49.5
 
 			if((pontoY >= (ytPC - area_px_ponto)) and (pontoY <= (ytPC + area_px_ponto))):
 
-				porcentagem_ponto += 49.9
+				porcentagem_ponto += 49.5
 
 			elif(distancia_ponto >= distancia_minima):
 
-				porcentagem_ponto += 49.9
+				porcentagem_ponto += 49.5
 
 			if(pontoX >= (xtPC - area_px_ponto) and pontoX <= (xtPC + area_px_ponto) and distancia_ponto >= distancia_minima):
 
@@ -258,8 +259,16 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		distancia_horizontal = round(abs(pontoX - xtPC) * fator_cm_px / fator_imgs, 2)
 
+		distanciaPontoConhecido = pc.calcula_distancias_entre_pontos((int(pontoX / fator_imgs), int(pontoY / fator_imgs)), ((int((xtM + xbM) / 2) / fator_imgs), int(ytM / fator_imgs)), "", fator_cm_px)
+
+		cv2.line(imagem, (pontoX, pontoY), (int((xtM + xbM) / 2), int(ytM)), (0, 255, 255), 2)
+
+		distanciaPontoConhecido = round(distanciaPontoConhecido, 2)
+
+		print(f"A distância do ponto selecionado para caixa conhecida: {distanciaPontoConhecido} cm")
+
 	if(not (caminhoSalva is None)):
 
 		cv2.imwrite(caminhoSalva + str(id_imagem) + "_k_validacao" + ".jpg", imagem)
 
-	return porcentagem_manga, porcentagem_pedunculo, porcentagem_ponto, distancia_horizontal
+	return porcentagem_manga, porcentagem_pedunculo, porcentagem_ponto, distancia_horizontal, distanciaPontoConhecido
