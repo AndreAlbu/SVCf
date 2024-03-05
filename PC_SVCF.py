@@ -975,7 +975,7 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		distancia_ponto_final = round(distancia_ponto_final, 2)
 
-		print(f"A distância do ponto selecionado é: {distancia_ponto_final} cm")
+		print(f"A distância do ponto selecionado para caixa IA: {distancia_ponto_final} cm")
 
 	return coordenadas_ordenadas[index], imagemHUE, distancia_ponto_final
 
