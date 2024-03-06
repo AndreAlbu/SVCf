@@ -190,7 +190,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		xtP, ytP, xbP, ybP = coordenadas_conhecidas[1][0][0], coordenadas_conhecidas[1][0][1], coordenadas_conhecidas[1][0][2], coordenadas_conhecidas[1][0][3]
 	
-		cv2.rectangle(imagem, (int(xtP), int(ytP)), (int(xbP), int(ybP)), (0, 255, 255,), 1)
+		cv2.rectangle(imagem, (int(xtP), int(ytP)), (int(xbP), int(ybP)), (0, 255, 255,), 2)
 
 		if(xtP >= pedunculoX and xbP <= pedunculoY):
 
@@ -231,7 +231,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 		area_px_ponto = encontra_area_px_ponto_corte(fator_ponto_area, fator_cm_px, fator_imgs)
 
 		cv2.circle(imagem, (xtPC, ytPC), 2, (0, 255, 255), -2)
-		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 0, 255), 2)
+		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 255, 255), 2)
 
 		cv2.rectangle(imagem, (int(xtPC - area_px_ponto), int(ytPC - area_px_ponto)), (int(xtPC + area_px_ponto), int(ytPC + area_px_ponto)), (0, 255, 255,), 1)
 
@@ -259,16 +259,18 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		distancia_horizontal = round(abs(pontoX - xtPC) * fator_cm_px / fator_imgs, 2)
 
-		distanciaPontoConhecido = pc.calcula_distancias_entre_pontos((int(pontoX / fator_imgs), int(pontoY / fator_imgs)), ((int((xtM + xbM) / 2) / fator_imgs), int(ytM / fator_imgs)), "", fator_cm_px)
+		distancia_vertical   = round(abs(pontoY - ytPC) * fator_cm_px / fator_imgs, 2)
+
+		distanciaCaixasManga = pc.calcula_distancias_entre_pontos((int(pontoX / fator_imgs), int(pontoY / fator_imgs)), ((int((xtM + xbM) / 2) / fator_imgs), int(ytM / fator_imgs)), "", fator_cm_px)
 
 		cv2.line(imagem, (pontoX, pontoY), (int((xtM + xbM) / 2), int(ytM)), (0, 255, 255), 2)
 
-		distanciaPontoConhecido = round(distanciaPontoConhecido, 2)
+		distanciaCaixasManga = round(distanciaCaixasManga, 2)
 
-		print(f"A distância do ponto selecionado para caixa conhecida: {distanciaPontoConhecido} cm")
+		print(f"A distância do ponto selecionado para caixa conhecida: {distanciaCaixasManga} cm")
 
 	if(not (caminhoSalva is None)):
 
 		cv2.imwrite(caminhoSalva + str(id_imagem) + "_k_validacao" + ".jpg", imagem)
 
-	return porcentagem_manga, porcentagem_pedunculo, porcentagem_ponto, distancia_horizontal, distanciaPontoConhecido
+	return porcentagem_manga, porcentagem_pedunculo, porcentagem_ponto, distancia_horizontal, distancia_vertical, distanciaCaixasManga
