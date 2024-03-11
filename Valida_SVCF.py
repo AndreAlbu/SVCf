@@ -1,3 +1,32 @@
+"""
+    Nome do Módulo: PC_SVCF
+
+    Descrição:
+      Este módulo contém funções para validar as imagens marcadas no contexto do Projeto SVCF.
+
+    Autor:
+      Hairon Gonçalves
+      André Albuquerque
+
+    Data de Criação:
+    Criação: 19/02/2024
+    Última Modificação: 11/03/2024
+
+    Requisitos:
+        Bibliotecas:
+           - Opencv
+           - Numpy
+           - Json
+           - Lidar
+           - PC_SVCF
+            
+    Licença:
+      Licença MIT
+
+    Notas:
+      Essa biblioteca faz parte do Projeto SVCF
+"""
+
 import json
 import numpy as np
 import cv2
@@ -181,7 +210,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 	porcentagem_manga = round(porcentagem_manga, 2)
 
-	cv2.rectangle(imagem, (int(xtM), int(ytM)), (int(xbM), int(ybM)), (0, 255, 255,), 1)
+	cv2.rectangle(imagem, (int(xtM), int(ytM)), (int(xbM), int(ybM)), (0, 255, 255,), 3)
 
 	#Porcentagem Pedúnculo e Ponto de Corte em imagens 2D
 	if(tipo_base == "3D"):
@@ -231,7 +260,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 		area_px_ponto = encontra_area_px_ponto_corte(fator_ponto_area, fator_cm_px, fator_imgs)
 
 		cv2.circle(imagem, (xtPC, ytPC), 2, (0, 255, 255), -2)
-		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 255, 255), 2)
+		cv2.circle(imagem, (xtPC, ytPC), area_px_ponto, (0, 255, 255), 3)
 
 		cv2.rectangle(imagem, (int(xtPC - area_px_ponto), int(ytPC - area_px_ponto)), (int(xtPC + area_px_ponto), int(ytPC + area_px_ponto)), (0, 255, 255,), 1)
 
