@@ -163,6 +163,31 @@ def area_pedunculo(imagem, pontoX, pontoY, coordenadas_pedunculo, inclinacao, cm
 
 	return encontrou
 
+def calcular_intersecao_porcentagem(coord1, coord2):
+    
+    tamanho_caixa_ia = coord1[2] - coord1[0]
+    
+    inicio_x = max(coord1[0], coord2[0])
+    fim_x = min(coord1[2], coord2[2])
+    
+    if fim_x >= inicio_x:
+
+        intersecao_x = fim_x - inicio_x
+        
+        if coord2[0] >= coord1[0] and coord2[2] <= coord1[2]:
+
+            porcentagem_intersecao_area_pedunculo = (intersecao_x / (coord2[2] - coord2[0])) * 100
+
+        else:
+
+            porcentagem_intersecao_area_pedunculo = (intersecao_x / tamanho_caixa_ia) * 100
+
+        return porcentagem_intersecao_area_pedunculo
+
+    else:
+
+        return 0
+
 #####################################################################################################
 #																									#
 #							      FUNÇÕES PARA VALIDAR PONTO DE CORTE    	     					#
@@ -221,9 +246,11 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 	
 		cv2.rectangle(imagem, (int(xtP), int(ytP)), (int(xbP), int(ybP)), (0, 255, 255,), 2)
 
-		if(xtP >= pedunculoX and xbP <= pedunculoY):
+		xtP_ia, ytP_ia, xbP_ia, ybP_ia = coordenada_pedunculo[0], coordenada_pedunculo[3], coordenada_pedunculo[2], coordenada_pedunculo[1]
 
-			porcentagem_pedunculo = 100.0
+		intersecao_pedunculo = calcular_intersecao_porcentagem((xtP_ia, ytP_ia, xbP_ia, ybP_ia), (xtP, ytP, xbP, ybP))
+
+		porcentagem_pedunculo = round(intersecao_pedunculo, 2)
 
 	elif(tipo_base == "2D"):
 
