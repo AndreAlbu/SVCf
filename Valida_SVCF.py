@@ -254,7 +254,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 	elif(tipo_base == "2D"):
 
-		porcentagem_ponto = 0.0
+		porcentagem_ponto = 0
 
 		inclinacao = coordenadas_conhecidas[3]
 
@@ -267,7 +267,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 			if((pontoX >= xtP - cm_px_2D) and (pontoX <= xbP + cm_px_2D) and (pontoY >= ytP - cm_px_2D) and (pontoY <= ybP + cm_px_2D)):
 
-				porcentagem_ponto = 100.0
+				porcentagem_ponto = 1
 
 		else:
 
@@ -275,12 +275,12 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 			if(encontrou):
 
-				porcentagem_ponto = 100.0
+				porcentagem_ponto = 1
 
 	#Verifica do ponto quando a imagem é 3D
 	if(tipo_base == "3D"):
 
-		porcentagem_ponto = 0.0
+		porcentagem_ponto = 0
 
 		xtPC, ytPC = coordenadas_conhecidas[2][0][0], coordenadas_conhecidas[2][0][1]
 
@@ -293,25 +293,11 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 		if((pontoX >= xtPC - area_px_ponto) and (pontoX <= xtPC + area_px_ponto) and (pontoY >= ytPC - area_px_ponto) and (pontoY <= ytPC + area_px_ponto)):
 
-			porcentagem_ponto = 100.0
+			porcentagem_ponto = 1
 
-		else:
+		if(pontoX >= (xtPC - area_px_ponto) and pontoX <= (xtPC + area_px_ponto) and distancia_ponto >= distancia_minima):
 
-			if((pontoX >= (xtPC - area_px_ponto) and pontoX <= (xtPC + area_px_ponto))):
-
-				porcentagem_ponto += 49.5
-
-			if((pontoY >= (ytPC - area_px_ponto)) and (pontoY <= (ytPC + area_px_ponto))):
-
-				porcentagem_ponto += 49.5
-
-			elif(distancia_ponto >= distancia_minima):
-
-				porcentagem_ponto += 49.5
-
-			if(pontoX >= (xtPC - area_px_ponto) and pontoX <= (xtPC + area_px_ponto) and distancia_ponto >= distancia_minima):
-
-				porcentagem_ponto = 99.0
+			porcentagem_ponto = 1
 
 		distancia_horizontal = round(abs(pontoX - xtPC) * fator_cm_px / fator_imgs, 2)
 
