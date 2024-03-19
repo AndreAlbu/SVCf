@@ -212,8 +212,10 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 
 	fator_imgs = 7.5
 
-	distancia_horizontal = 0
+	distancia_horizontal    = 0
 	distanciaPontoConhecido = 0
+	distancia_vertical      = 0
+	distanciaCaixasManga    = 0
 
 	porcentagem_pedunculo = -1
 
@@ -265,7 +267,7 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 	
 			cv2.rectangle(imagem, (int(xtP - cm_px_2D), int(ytP)), (int(xbP + cm_px_2D), int(ybP)), (0, 255, 255,), 1)
 
-			if((pontoX >= xtP - cm_px_2D) and (pontoX <= xbP + cm_px_2D) and (pontoY >= ytP - cm_px_2D) and (pontoY <= ybP + cm_px_2D)):
+			if((pontoX >= xtP - cm_px_2D) and (pontoX <= xbP + cm_px_2D)):
 
 				porcentagem_ponto = 1
 
