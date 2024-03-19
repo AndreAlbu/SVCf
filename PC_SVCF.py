@@ -10,7 +10,7 @@
 
     Data de Criação:
     Criação: 19/02/2024
-    Última Modificação: 18/03/2024
+    Última Modificação: 19/03/2024
 
     Requisitos:
         Bibliotecas:
@@ -221,7 +221,7 @@ def encontraPontosCandidatos(areaPedunculo, caminhoSalva):
 
 		areaPedunculo = cv2.cvtColor(areaPedunculo, cv2.COLOR_BGR2HSV) #Converte a imagem para HSV
 
-		valorMaximoHUE = histogramaHSV(areaPedunculo,caminhoSalva)
+		valorMaximoHUE = histogramaHSV(areaPedunculo, caminhoSalva)
 
 		todas_coordenadas  =  [ ] #Guarda todas as coordenadas (eixo X e Y)
 		todas_coordenadasX =  [ ] #Guarda as coordenadas do eixo X vindas dos cantos encontrados
@@ -943,78 +943,62 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 #																									#
 #####################################################################################################
 
-def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBase, largura_caixa_pedunculo):
+def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largura_caixa_pedunculo, altura_manga_px):
+
+	print("Função: --> Seleciona ponto final")
 
 	distancia_ponto_final = -1
 
 	largura_x = int(largura_caixa_pedunculo / 2)
 
-	coordenadas_np = np.array(coordenadas)
+	lista_pesos = [ ]
 
-	indeces_ordenadas = np.argsort(coordenadas_np[:, 1])
+	pdc = 3
+	pd3 = 2
 
-	coordenadas_ordenadas = coordenadas_np[indeces_ordenadas]
+	if(tipoBase == "2D"):
 
-	tamanho_coordenadas = len(coordenadas_ordenadas)
+		for p in range(len(coordenadas)):
 
-	if(posicao == "top"):
+			dc = abs(coordenadas[p][0] - largura_x)
 
-		print("Posição definida: top")
+			dm = abs(coordenadas[p][1] - altura_manga_px)
 
-		index = 0
+			dpa = (dc * pdc + dm * pd3) / (pdc + pd3)
 
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
+			lista_pesos.append(dpa)
 
-	elif(posicao == "center"):
+		index = lista_pesos.index(min(lista_pesos))
 
-		print("Posição definida: center")
+		cv2.circle(imagemHUE, coordenadas[index], 5, (0, 0, 255), -2)
 
-		index = (tamanho_coordenadas // 2)
+		print(f"Coordenada selecionada: {coordenadas[index]}")
 
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
-
-	elif(posicao == "low"):
-
-		print("Posição definida: low")
-
-		index = tamanho_coordenadas - 1
-
-		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
-
-		coord_final = coordenadas_ordenadas[index]
+		coord_final = coordenadas[index]
 
 	else:
 
-		print("Posição definida: heuristica do ponto")
+		for p in range(len(coordenadas)):
 
-		lista_pesos = [ ]
+			dc = abs(coordenadas[p][0] - largura_x)
 
-		if(tipoBase == "3D"):
+			d3 = abs(distancias_correta[p] - 3)
 
-			pdc = 3
-			pd3 = 5
+			dpa = (dc * pdc + d3 * pd3) / (pdc + pd3)
 
-			for p in range(len(coordenadas)):
+			lista_pesos.append(dpa)
 
-				dc = abs(coordenadas[p][0] - largura_x)
+		index = lista_pesos.index(min(lista_pesos))
 
-				d3 = abs(distancias_correta[p] - 3)
+		cv2.circle(imagemHUE, coordenadas[index], 5, (0, 0, 255), -2)
 
-				peso = (dc * pdc + d3 * pd3) / (pdc + pd3)
+		distancia_ponto_final = distancias_correta[index]
 
-				lista_pesos.append(peso)
+		distancia_ponto_final = round(distancia_ponto_final, 2)
 
-			index = lista_pesos.index(min(lista_pesos))
+		print(f"A distância do ponto selecionado para caixa IA: {distancia_ponto_final} cm")
 
-			cv2.circle(imagemHUE, coordenadas[index], 5, (0, 255, 0), -2)
-
-			distancia_ponto_final = distancias_correta[index]
-
-			distancia_ponto_final = round(distancia_ponto_final, 2)
-
-			print(f"A distância do ponto selecionado para caixa IA: {distancia_ponto_final} cm")
-
-			coord_final = coordenadas[index]
+		coord_final = coordenadas[index]
 
 	return coord_final, imagemHUE, distancia_ponto_final
 
@@ -1038,6 +1022,8 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
     distancia_ponto_final = -1
 
     largura_caixa_pedunculo = areaPedunculo.shape[1]
+
+    y_manga_pixel = areaPedunculo.shape[0]
 
     caminhoSalva = caminhoSalva + id_imagem + "_" + id_manga_localizada + "_"
 
@@ -1067,7 +1053,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, posicaoDesejada, None, None, largura_caixa_pedunculo)
+    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, None, tipoBase, largura_caixa_pedunculo, y_manga_pixel)
 
     	pontoFinalX, pontoFinalY, imagemHueD = int(info_2D[0][0]), int(info_2D[0][1]), info_2D[1]
 
@@ -1099,7 +1085,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, posicaoDesejada, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo)
+    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo, None)
 
     	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2]
 
