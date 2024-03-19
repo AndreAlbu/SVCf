@@ -10,7 +10,7 @@
 
     Data de Criação:
     Criação: 19/02/2024
-    Última Modificação: 26/02/2024
+    Última Modificação: 18/03/2024
 
     Requisitos:
         Bibliotecas:
@@ -703,37 +703,39 @@ def remove_pontos_fc_outliners(coordenadas, limite):
 
 	return listaNova
 
-def remove_pontos_fc_isolation_forest(coordenadas):
+def remove_pontos_fc_isolation_forest(coordenadas, distancias):
 
 	print("Função: --> Método IsolationForest")
 
 	try:
 
+		distancias_filtradas = 0
+
+		coordenadas = np.array(coordenadas)
+
 		clf = IsolationForest(random_state=0).fit(coordenadas)
 
 		resul = clf.predict(coordenadas)
 
-		resul = clf.predict(coordenadas)
+		indices_validos = resul == 1
 
-		cordNovo = [ ]
+		coordenadas_filtradas = coordenadas[indices_validos]
 
-		for i in range(len(resul)):
+		if(not (distancias is None)):
 
-		  j = coordenadas[i]
+			distancias = np.array(distancias)
 
-		  if(resul[i] == 1):
+			distancias_filtradas = distancias[indices_validos]
 
-		    cordNovo.append(j)
-
-		return cordNovo
+		return coordenadas_filtradas, distancias_filtradas
 
 	except ValueError:
 
-		print("Erro na função: Isolation Forest")
+		print("Erro na função: Isolation Forest  -------------->>Erro<<--------------")
 
 		return [0]
 
-def remove_pontos_dc(coordenadas, imagemHUE, metodo):
+def remove_pontos_dc(coordenadas, imagemHUE, metodo, altura_coordenadas):
 
 	print("Função: --> Remove Pontos Fora da Curva")
 
@@ -741,25 +743,37 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 	if(metodo == "IsolationForest"):
 
-		isolation = remove_pontos_fc_isolation_forest(coordenadas)
+		f_isolation = remove_pontos_fc_isolation_forest(coordenadas, altura_coordenadas)
 
-		tamanho_isolation = len(isolation)
+		if(len(f_isolation) > 1):
 
-		print(f"Quantidade de pontos selecionados: {tamanho_isolation}")
+			isolation, distancias_correta = f_isolation[0], f_isolation[1]
 
-		quantidade_clusters_selecionados = tamanho_isolation
+			tamanho_isolation = len(isolation)
 
-		if(tamanho_isolation > 0):
+			print(f"Quantidade de pontos selecionados: {tamanho_isolation}")
 
-			for i_isolation in range(tamanho_isolation):
-				
-				cv2.circle(imagemHUE, (isolation[i_isolation][0], isolation[i_isolation][1]), 5, (0, 255, 255), 2)
+			quantidade_clusters_selecionados = tamanho_isolation
 
-			coordenadas_pontos_dc = isolation
+			if(tamanho_isolation > 0):
+
+				for i_isolation in range(tamanho_isolation):
+					
+					cv2.circle(imagemHUE, (isolation[i_isolation][0], isolation[i_isolation][1]), 5, (0, 255, 255), 2)
+
+				coordenadas_pontos_dc = isolation
+
+			else:
+
+				print("IsolationForest = ------------------------------------>>>0<<<------------------------------------")
+
+				coodenadas_erro = funcao_coordenada_central(imagemHUE)
+
+				coordenadas_pontos_dc = coodenadas_erro
 
 		else:
 
-			print("IsolationForest = 0")
+			print("IsolationForest = ------------------------------------>>>Nao clusterizado<<<------------------------------------")
 
 			coodenadas_erro = funcao_coordenada_central(imagemHUE)
 
@@ -773,7 +787,7 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 		tamanho_outliners = len(outLin)
 
-		print(f"Quantidadle de pontos selecionados: {tamanho_outliners}")
+		print(f"Quantidade de pontos selecionados: {tamanho_outliners}")
 
 		coordenadas_pontos_dc = tamanho_outliners
 
@@ -787,13 +801,13 @@ def remove_pontos_dc(coordenadas, imagemHUE, metodo):
 
 		else:
 
-			print("Outliners = 0")
+			print("Outliners = ------------------------------------>>>0<<<------------------------------------")
 
 			coodenadas_erro = funcao_coordenada_central(imagemHUE)
 
 			coordenadas_pontos_dc = coodenadas_erro
 
-	return coordenadas_pontos_dc, imagemHUE
+	return coordenadas_pontos_dc, imagemHUE, distancias_correta
 
 #####################################################################################################
 #																									#
@@ -929,9 +943,11 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 #																									#
 #####################################################################################################
 
-def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBase):
+def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBase, largura_caixa_pedunculo):
 
 	distancia_ponto_final = -1
+
+	largura_x = int(largura_caixa_pedunculo / 2)
 
 	coordenadas_np = np.array(coordenadas)
 
@@ -957,7 +973,7 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
-	else:
+	elif(posicao == "low"):
 
 		print("Posição definida: low")
 
@@ -965,19 +981,42 @@ def seleciona_ponto(coordenadas, imagemHUE, posicao, distancias_correta, tipoBas
 
 		cv2.circle(imagemHUE, coordenadas_ordenadas[index], 5, (0, 255, 0), -2)
 
-	if(tipoBase == "3D"):
+		coord_final = coordenadas_ordenadas[index]
 
-		distancias_correta_np = np.array(distancias_correta)
+	else:
 
-		distancias_correta = distancias_correta_np[indeces_ordenadas]
+		print("Posição definida: heuristica do ponto")
 
-		distancia_ponto_final = distancias_correta[index]
+		lista_pesos = [ ]
 
-		distancia_ponto_final = round(distancia_ponto_final, 2)
+		if(tipoBase == "3D"):
 
-		print(f"A distância do ponto selecionado para caixa IA: {distancia_ponto_final} cm")
+			pdc = 3
+			pd3 = 5
 
-	return coordenadas_ordenadas[index], imagemHUE, distancia_ponto_final
+			for p in range(len(coordenadas)):
+
+				dc = abs(coordenadas[p][0] - largura_x)
+
+				d3 = abs(distancias_correta[p] - 3)
+
+				peso = (dc * pdc + d3 * pd3) / (pdc + pd3)
+
+				lista_pesos.append(peso)
+
+			index = lista_pesos.index(min(lista_pesos))
+
+			cv2.circle(imagemHUE, coordenadas[index], 5, (0, 255, 0), -2)
+
+			distancia_ponto_final = distancias_correta[index]
+
+			distancia_ponto_final = round(distancia_ponto_final, 2)
+
+			print(f"A distância do ponto selecionado para caixa IA: {distancia_ponto_final} cm")
+
+			coord_final = coordenadas[index]
+
+	return coord_final, imagemHUE, distancia_ponto_final
 
 #####################################################################################################
 #																									#
@@ -997,6 +1036,8 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     fator_imgs_3D = 7.5
     distancia_ponto_final = -1
+
+    largura_caixa_pedunculo = areaPedunculo.shape[1]
 
     caminhoSalva = caminhoSalva + id_imagem + "_" + id_manga_localizada + "_"
 
@@ -1020,13 +1061,13 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	if(removePontos and metodoCluster != "Heuristica"):
 
-	    	pontos_dentro_curva = remove_pontos_dc(coordenadas_clusterizadas, imagemHUE, metodoFC)
+	    	pontos_dentro_curva = remove_pontos_dc(coordenadas_clusterizadas, imagemHUE, metodoFC, None)
 
 	    	coordenadas_clusterizadas, imagemHueDC = pontos_dentro_curva[0], pontos_dentro_curva[1]
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, posicaoDesejada, None, None)
+    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, posicaoDesejada, None, None, largura_caixa_pedunculo)
 
     	pontoFinalX, pontoFinalY, imagemHueD = int(info_2D[0][0]), int(info_2D[0][1]), info_2D[1]
 
@@ -1052,13 +1093,13 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	if(removePontos and metodoCluster != "Heuristica"):
 
-	    	pontos_dentro_curva = remove_pontos_dc(coordenadas_corretas, imagemHUE, metodoFC)
+	    	pontos_dentro_curva = remove_pontos_dc(coordenadas_corretas, imagemHUE, metodoFC, distancias_correta)
 
-	    	coordenadas_corretas, imagemHueDC = pontos_dentro_curva[0], pontos_dentro_curva[1]
+	    	coordenadas_corretas, imagemHueDC, distancias_corretas_dc = pontos_dentro_curva[0], pontos_dentro_curva[1], pontos_dentro_curva[2]
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, posicaoDesejada, distancias_correta, tipoBase)
+    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, posicaoDesejada, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo)
 
     	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2]
 
