@@ -10,7 +10,7 @@
 
     Data de Criação:
     Criação: 19/02/2024
-    Última Modificação: 19/03/2024
+    Última Modificação: 20/03/2024
 
     Requisitos:
         Bibliotecas:
@@ -944,9 +944,6 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 
     			largura_x = int(largura_x / 2)
 
-    			print(coordenadasCandidatas)
-    			print(distancias_gerais)
-
     			for p in range(len(coordenadasCandidatas)):
 
     				dc = abs(coordenadasCandidatas[p][0] - largura_x)
@@ -962,8 +959,6 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
     			x_erro = int(coordenadasCandidatas[index][0])
 
     	coord_altura_correta = (x_erro, int(y_erro - altura_correta))
-
-    	print(coord_altura_correta)
 
     	coordenadas_proximas.append((coord_altura_correta))
 
@@ -982,7 +977,8 @@ def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largur
 
 	print("Função: --> Seleciona ponto final")
 
-	distancia_ponto_final = -1
+	distancia_ponto_final      = -1
+	distanciaProfundidadePonto = -1
 
 	largura_x = int(largura_caixa_pedunculo / 2)
 
@@ -1035,14 +1031,16 @@ def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largur
 
 		coord_final = coordenadas[index]
 
-		x_distancia = int((coord_final[0] + topLeftX) / 7.5)
-		y_distancia = int((coord_final[1] + topLeftY) / 7.5)
+		x_distancia = int((coordenadas[index][0] + topLeftX) / 7.5)
+		y_distancia = int((coordenadas[index][1] + topLeftY) / 7.5)
 
-		#distanciaProfundidadePonto = lidar.measureDistanceOnePoint((x_distancia, y_distancia), pontosJson)
+		distanciaProfundidadePonto = lidar.measureDistanceOnePoint((x_distancia, y_distancia), pontosJson)
 
-		#print(f"Distancia profundidade ponto selecionado: {round(distanciaProfundidadePonto, 2)} cm")
+		distanciaProfundidadePonto = round(distanciaProfundidadePonto, 2)
 
-	return coord_final, imagemHUE, distancia_ponto_final
+		print(f"Distancia profundidade ponto selecionado: {distanciaProfundidadePonto} cm")
+
+	return coord_final, imagemHUE, distancia_ponto_final, distanciaProfundidadePonto
 
 #####################################################################################################
 #																									#
@@ -1061,7 +1059,8 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
     areaPedunculo = segmentaAreaPedunculo(areaPedunculo, baixo, alto)
 
     fator_imgs_3D = 7.5
-    distancia_ponto_final = -1
+    distancia_ponto_final      = -1
+    distanciaProfundidadePonto = -1
 
     largura_caixa_pedunculo = areaPedunculo.shape[1]
 
@@ -1129,7 +1128,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo, None, pontosJson, topLeftX, topLeftY)
 
-    	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2]
+    	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final, distanciaProfundidadePonto = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2], info_3D[3]
 
     	imagemHueD_ = imagemHueD.copy()
 
@@ -1150,4 +1149,4 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
     coordenadaFinalX = topLeftX + pontoFinalX
     coordenadaFinalY = topLeftY + pontoFinalY
     
-    return coordenadaFinalX, coordenadaFinalY, valorHue, distancia_ponto_final
+    return coordenadaFinalX, coordenadaFinalY, valorHue, distancia_ponto_final, distanciaProfundidadePonto
