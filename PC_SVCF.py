@@ -873,10 +873,13 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
     
     qtdPontoCorretosCorte = 0
 
+    largura_x = area_pedunculo.shape[1]
+
     print("Função: --> Seleciona pontos 3D")
 
     coordenadas_proximas     = [ ]
     distancias_pontos_cortes = [ ]
+    distancias_gerais = [ ]
     
     quantidadePontosEncontrados = len(coordenadasCandidatas)
     
@@ -893,6 +896,8 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
             y_lidar = int((coord[1] + TopLeftY) / fator_imgs_3D)
                                                            
             distanciaPontoCandidato = calcula_distancias_entre_pontos((x_centro_caixa, y_centro_caixa), (x_lidar, y_lidar), pontosJson, cm_px)
+
+            distancias_gerais.append(distanciaPontoCandidato)
             
             if(distanciaPontoCandidato >= altura_minima_ponto):
                 
@@ -924,11 +929,41 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 
     	x_erro, y_erro = int(x_erro - TopLeftX), int(y_erro - TopLeftY)
 
-    	if(metodo == "Heuristica" and len(coordenadasCandidatas) > 0):
+    	if(len(coordenadasCandidatas) > 0):
 
-    		x_erro = int(coordenadasCandidatas[0][0])
+    		if(metodo == "Heuristica"):
+
+    			x_erro = int(coordenadasCandidatas[0][0])
+
+    		else:
+
+    			pdc = 3
+    			pd3 = 2
+
+    			lista_pesos = [ ]
+
+    			largura_x = int(largura_x / 2)
+
+    			print(coordenadasCandidatas)
+    			print(distancias_gerais)
+
+    			for p in range(len(coordenadasCandidatas)):
+
+    				dc = abs(coordenadasCandidatas[p][0] - largura_x)
+
+    				d3 = abs(distancias_gerais[p] - 3)
+
+    				dpa = (dc * pdc + d3 * pd3) / (pdc + pd3)
+
+    				lista_pesos.append(dpa)
+
+    			index = lista_pesos.index(min(lista_pesos))
+
+    			x_erro = int(coordenadasCandidatas[index][0])
 
     	coord_altura_correta = (x_erro, int(y_erro - altura_correta))
+
+    	print(coord_altura_correta)
 
     	coordenadas_proximas.append((coord_altura_correta))
 
@@ -943,7 +978,7 @@ def seleciona_candidatos_3D(area_pedunculo, coordenadasCandidatas, pontosJson, c
 #																									#
 #####################################################################################################
 
-def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largura_caixa_pedunculo, altura_manga_px):
+def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largura_caixa_pedunculo, altura_manga_px, pontosJson, topLeftX, topLeftY):
 
 	print("Função: --> Seleciona ponto final")
 
@@ -1000,6 +1035,13 @@ def seleciona_ponto(coordenadas, imagemHUE, distancias_correta, tipoBase, largur
 
 		coord_final = coordenadas[index]
 
+		x_distancia = int((coord_final[0] + topLeftX) / 7.5)
+		y_distancia = int((coord_final[1] + topLeftY) / 7.5)
+
+		#distanciaProfundidadePonto = lidar.measureDistanceOnePoint((x_distancia, y_distancia), pontosJson)
+
+		#print(f"Distancia profundidade ponto selecionado: {round(distanciaProfundidadePonto, 2)} cm")
+
 	return coord_final, imagemHUE, distancia_ponto_final
 
 #####################################################################################################
@@ -1053,7 +1095,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, None, tipoBase, largura_caixa_pedunculo, y_manga_pixel)
+    	info_2D = seleciona_ponto(coordenadas_clusterizadas, imagemHUE, None, tipoBase, largura_caixa_pedunculo, y_manga_pixel, None, None, None)
 
     	pontoFinalX, pontoFinalY, imagemHueD = int(info_2D[0][0]), int(info_2D[0][1]), info_2D[1]
 
@@ -1067,13 +1109,13 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     	fator_cm_px = obter_cm_px(4, 2, centroMangaX, centroMangaY, pontosJson)
 
-    	#print(f"Fator cm_px: {fator_cm_px}")
-
     	candidatos_corretos = seleciona_candidatos_3D(imagemHUE_, coordenadas_clusterizadas, pontosJson, fator_cm_px, fator_imgs_3D, pontoCentroTopoCaixa, topLeftX, topLeftY, alturaMinima, metodoCluster)
 
     	coordenadas_corretas, distancias_correta, imagemHueCorreta = candidatos_corretos[0], candidatos_corretos[1], candidatos_corretos[2]
 
     	imagemHueCorreta_ = imagemHueCorreta.copy()
+
+    	distancias_corretas_dc = distancias_correta
 
     	imagemHueDC = imagemHueCorreta.copy()
 
@@ -1085,7 +1127,7 @@ def localiza_ponto_final(id_imagem, id_manga_localizada, areaPedunculo, baixo, a
 
     		imagemHueDC_ = imagemHueDC.copy()
 
-    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo, None)
+    	info_3D = seleciona_ponto(coordenadas_corretas, imagemHueDC, distancias_corretas_dc, tipoBase, largura_caixa_pedunculo, None, pontosJson, topLeftX, topLeftY)
 
     	pontoFinalX, pontoFinalY, imagemHueD, distancia_ponto_final = info_3D[0][0], info_3D[0][1], info_3D[1], info_3D[2]
 
