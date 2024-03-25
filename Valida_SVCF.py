@@ -10,7 +10,7 @@
 
     Data de Criação:
     Criação: 19/02/2024
-    Última Modificação: 11/03/2024
+    Última Modificação: 25/03/2024
 
     Requisitos:
         Bibliotecas:
@@ -310,8 +310,6 @@ def valida_svcf(imagem, caminhoSalva, id_imagem, id_manga_localizada, tipo_base,
 		cv2.line(imagem, (pontoX, pontoY), (int((xtM + xbM) / 2), int(ytM)), (0, 255, 255), 2)
 
 		distanciaCaixasManga = round(distanciaCaixasManga, 2)
-
-		print(f"A distância do ponto selecionado para caixa conhecida: {distanciaCaixasManga} cm")
 
 	if(not (caminhoSalva is None)):
 
