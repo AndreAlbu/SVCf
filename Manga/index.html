@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cloud_upload" />
+
+  <link rel="stylesheet" href="./styles.css">
+
+  <title>Mangando</title>
+</head>
+<body>
+  <nav class="hero flex-row">
+    <div class="navigation flex-row">
+      <a id="home" href="#" class="link-navigation">Página inicial</a>
+      <a id="about" href="about.html" class="link-navigation">Sobre o projeto</a>
+    </div>
+  </nav>
+
+  <main id="main"></main>
+
+  <script>
+    window.onload = function() {
+      // Obter a URL atual
+      const currentUrl = window.location.href;
+
+      // Selecionar todos os links da navegação
+      const links = document.querySelectorAll("nav a");
+
+      // Iterar sobre todos os links
+      links.forEach(link => {
+          // Verificar se o href do link corresponde à URL atual
+          if (currentUrl.includes(link.href)) {
+            loadHTML(`${link.id}.html`, "main");
+            link.classList.add("selected"); // Adiciona a classe 'selected'
+          }
+      });
+
+    };
+
+    function previewImage(event) {
+        const file = event.target.files[0]; // Pegando o primeiro arquivo
+        const reader = new FileReader(); // Criando um FileReader para ler a imagem
+
+        reader.onload = function() {
+            const imgElement = document.getElementById('imagePreview');
+            imgElement.src = reader.result; // Definindo a URL da imagem
+            imgElement.style.display = 'block'; // Mostrando a imagem
+        }
+
+        if (file) {
+            reader.readAsDataURL(file); // Lendo a imagem como URL de dados
+        }
+    }
+
+    // Função para carregar um arquivo HTML em um div
+    function loadHTML(file, elementId) {
+      fetch(file)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById(elementId).innerHTML = data;
+        })
+        .catch(error => console.error('Erro ao carregar o arquivo:', error));
+    }
+  </script>
+</body>
+</html>

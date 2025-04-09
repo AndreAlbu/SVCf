@@ -1,0 +1,32 @@
+<section class="container flex-row">
+  <div class="image-content">
+    <img id="imagePreview" src="./images/manga-color.png" alt="background manga">
+  </div>
+  
+  <div class="flex-col content">
+    <div class="text-group">
+      <h1>Capture ou carregue suas imagens</h1>
+      <ul>
+        <li>Mantenha o celular na horizontal.</li>
+        <li>Foque em uma única manga.</li>
+        <li>Capture a imagem com o pedúnculo visível.</li>
+      </ul>
+    </div>
+
+    <div class="flex-col input-group">
+      <form action="#" class="file-input-container">
+        <label class="file-label" for="imageInput">
+          <span class="material-symbols-outlined" style="font-size: 32px;">
+            cloud_upload
+          </span>
+          <span>Escolher Imagem</span>
+        </label>
+
+        <!-- Input de arquivo escondido -->
+        <input type="file" id="imageInput" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(event)" />
+      </form>
+      
+      <span>Somente arquivos no formato .jpg, .png, .jpeg</span>
+    </div>
+  </div>
+</section>

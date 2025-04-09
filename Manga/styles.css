@@ -1,0 +1,153 @@
+:root {
+  --gray: #F8F8F8,
+  --white: #FFFFFF,
+  --text-primary: #222224,
+  --text-secondary: #777780
+  --text-tertiary: #4C4C4F
+}
+
+* {
+  font-family: Roboto;
+
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: white;
+}
+
+a {
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  height: 88px;
+  width: 100%;
+  background-color: #F8F8F8;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 112px;
+}
+
+.navigation {
+  gap: 32px;
+  cursor: pointer;
+}
+
+.link-navigation {
+  color: #222224CC;
+}
+
+.link-navigation:hover {
+  color: #222224;
+}
+
+.link-navigation.selected {
+  color: #222224;
+  font-weight: 700;
+}
+
+main {
+  padding: 80px;
+  width: 100vw;
+}
+
+.container {
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+.image-content {
+  height: 480px;
+  width: 592px;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-content > img {
+  height: 100%;
+}
+
+.content {
+  height: 480px;
+  justify-content: end;
+}
+
+.text-group > h1 {
+  font-weight: 600;
+  font-size: 32px;
+  color: #31303A;
+  margin-bottom: 16px;
+}
+
+.text-group > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 25px;
+  margin-bottom: 80px;
+}
+
+.text-group > ul > li {
+  color: #4D4D57;
+  font-size: 18px;
+  font-weight: 16px;
+}
+
+.input-group {
+  gap: 24px;
+  margin-bottom: 10px;
+}
+
+.input-group > span {
+  font-weight: 400;
+  font-size: 16px;
+  color: #696A6D;
+}
+
+/* Contêiner do input */
+.file-input-container {
+  height: 96px;
+  width: 592px;
+  background-color: #fff;
+  border: 1px solid #0E5B0D;
+  border-radius: 16px;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}
+
+.file-label {
+  color: #0E5B0D;
+  font-size: 24px;
+  font-weight: 400;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+#imageInput {
+  display: none;
+}
