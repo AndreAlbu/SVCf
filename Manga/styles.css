@@ -138,6 +138,8 @@ main {
 }
 
 .file-label {
+  width: 100%;
+  height: 100%;
   color: #0E5B0D;
   font-size: 24px;
   font-weight: 400;
@@ -146,10 +148,12 @@ main {
   align-items: center;
   justify-content: center;
   gap: 24px;
+  cursor: pointer;
 }
 
 #imageInput {
   display: none;
+  cursor: pointer;
 }
 
 .back-button {
