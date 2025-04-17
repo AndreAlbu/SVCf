@@ -16,12 +16,43 @@
 <body>
   <nav class="hero flex-row">
     <div class="navigation flex-row">
-      <a id="home" href="#" class="link-navigation">Página inicial</a>
+      <a id="home" href="index.html" class="link-navigation">Página inicial</a>
       <a id="about" href="about.html" class="link-navigation">Sobre o projeto</a>
     </div>
   </nav>
 
-  <main id="main"></main>
+  <section class="container flex-row">
+    <div class="image-content">
+      <img id="imagePreview" src="./images/manga-color.png" alt="background manga">
+    </div>
+    
+    <div class="flex-col content">
+      <div class="text-group">
+        <h1>Capture ou carregue suas imagens</h1>
+        <ul>
+          <li>Mantenha o celular na horizontal.</li>
+          <li>Foque em uma única manga.</li>
+          <li>Capture a imagem com o pedúnculo visível.</li>
+        </ul>
+      </div>
+  
+      <div class="flex-col input-group">
+        <form action="#" class="file-input-container">
+          <label class="file-label" for="imageInput">
+            <span class="material-symbols-outlined" style="font-size: 32px;">
+              cloud_upload
+            </span>
+            <span>Escolher Imagem</span>
+          </label>
+  
+          <!-- Input de arquivo escondido -->
+          <input type="file" id="imageInput" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(event)" />
+        </form>
+        
+        <span>Somente arquivos no formato .jpg, .png, .jpeg</span>
+      </div>
+    </div>
+  </section>
 
   <script>
     window.onload = function() {
@@ -35,11 +66,10 @@
       links.forEach(link => {
           // Verificar se o href do link corresponde à URL atual
           if (currentUrl.includes(link.href)) {
-            loadHTML(`${link.id}.html`, "main");
             link.classList.add("selected"); // Adiciona a classe 'selected'
+            loadHTML(`${link.id}.html`, "main");
           }
       });
-
     };
 
     function previewImage(event) {

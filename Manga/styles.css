@@ -151,3 +151,16 @@ main {
 #imageInput {
   display: none;
 }
+
+.back-button {
+  padding: 10px 20px;
+  background-color: #222224;
+  color: #F8F8F8;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  color: #F8F8F8;
+  opacity: 0.9;
+}
